@@ -1,6 +1,6 @@
 spring:
   application:
-    name: extended-mongo-skeleton
+    name: extended-mysql-skeleton
 
   cloud:
     config:
