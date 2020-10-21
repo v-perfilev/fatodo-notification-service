@@ -8,29 +8,3 @@ spring:
       failFast: true
       username: config-user
       password: ${CONFIG_SERVER_PASSWORD:dev}
-
-
-#  datasource:
-#    type: com.zaxxer.hikari.HikariDataSource
-#    url: jdbc:h2:file:./target/h2db/db/fatodo;DB_CLOSE_DELAY=-1
-#    username: mysql-user
-#    password: dev
-#    hikari:
-#      poolName: Hikari
-#      auto-commit: false
-#  h2:
-#    console:
-#      enabled: false
-#  jpa:
-#    open-in-view: false
-
-#  datasource:
-#    type: com.zaxxer.hikari.HikariDataSource
-#    url: jdbc:mysql://localhost:3306/fatodo?useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-#    username: mysql-user
-#    password: dev
-#    hikari:
-#      poolName: Hikari
-#      auto-commit: false
-#  jpa:
-#    show-sql: false
