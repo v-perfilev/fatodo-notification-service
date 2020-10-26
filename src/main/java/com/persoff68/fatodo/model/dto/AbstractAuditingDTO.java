@@ -4,15 +4,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.Instant;
-import java.util.UUID;
+import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractAuditingDTO extends AbstractDTO {
 
-    protected UUID createdBy;
+    protected Date createdBy;
     protected Instant createdAt;
-    protected UUID lastModifiedBy;
+    protected Date lastModifiedBy;
     protected Instant lastModifiedAt;
 
 }
