@@ -3,16 +3,16 @@ package com.persoff68.fatodo.model.dto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractAuditingDTO extends AbstractDTO {
 
-    protected Date createdBy;
-    protected Instant createdAt;
-    protected Date lastModifiedBy;
-    protected Instant lastModifiedAt;
+    protected UUID createdBy;
+    protected Date createdAt;
+    protected UUID lastModifiedBy;
+    protected Date lastModifiedAt;
 
 }
