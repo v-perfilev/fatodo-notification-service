@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.persoff68.fatodo</groupId>
-    <artifactId>extendedmongoskeleton</artifactId>
+    <artifactId>extendedmysqlskeleton</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>extended-mysql-skeleton</name>
     <description>Extended mysql skeleton for Fatodo</description>
