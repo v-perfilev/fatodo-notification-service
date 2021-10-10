@@ -1,6 +1,6 @@
-# Fatodo extended-mongo-skeleton
+# Fatodo notification-service
 
-Spring app that is used for development of complex microservices with mongodb.
+Spring app that is used for notifications based on extended-mongo-skeleton.
 
 ## Tests
 
