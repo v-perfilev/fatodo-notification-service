@@ -15,17 +15,17 @@ import java.util.UUID;
 @Repository
 public interface ReminderRepository extends MongoRepository<Reminder, UUID> {
 
-    @Query(value = "{ 'targetId': ?0 }")
-    @CacheableMethod(cacheName = "reminders-by-target-id", key = "#targetId")
-    List<Reminder> findAllByTargetId(UUID targetId);
+    @Query(value = "{ 'threadId': ?0 }")
+    @CacheableMethod(cacheName = "reminders-by-thread-id", key = "#threadId")
+    List<Reminder> findAllByThreadId(UUID threadId);
 
     @Override
-    @CacheEvictMethod(cacheName = "reminders-by-target-id", key = "#reminder.targetId")
+    @CacheEvictMethod(cacheName = "reminders-by-thread-id", key = "#reminder.threadId")
     @NonNull
     <S extends Reminder> S save(@NonNull S reminder);
 
     @Override
-    @CacheEvictMethod(cacheName = "reminders-by-target-id", key = "#reminder.targetId")
+    @CacheEvictMethod(cacheName = "reminders-by-thread-id", key = "#reminder.threadId")
     void delete(@Nonnull Reminder reminder);
 
 }

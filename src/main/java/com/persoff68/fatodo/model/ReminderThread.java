@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.model;
 
-import com.persoff68.fatodo.model.constant.Periodicity;
+import com.persoff68.fatodo.model.constant.ReminderThreadType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,27 +9,27 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
-@Document(collection = "ftd_reminder")
+@Document(collection = "ftd_reminder_thread")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Reminder extends AbstractModel {
+public class ReminderThread extends AbstractModel {
 
     @NotNull
     @Indexed
-    private UUID threadId;
+    private UUID targetId;
 
-    private Periodicity periodicity;
-    private DateParams date;
-    private List<Integer> weekDays;
-    private List<Integer> monthDays;
+    @NotNull
+    ReminderThreadType type;
 
-    @Indexed
-    private Instant lastUpdated;
+    public static ReminderThread of(UUID targetId, ReminderThreadType type) {
+        ReminderThread thread = new ReminderThread();
+        thread.setTargetId(targetId);
+        thread.setType(type);
+        return thread;
+    }
 
 }

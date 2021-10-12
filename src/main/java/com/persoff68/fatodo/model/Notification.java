@@ -27,6 +27,6 @@ public class Notification extends AbstractModel {
     private Instant date;
 
     @NotNull
-    private NotificationStatus status;
+    private NotificationStatus status = NotificationStatus.CREATED;
 
 }
