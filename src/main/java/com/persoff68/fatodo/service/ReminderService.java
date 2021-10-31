@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,11 +37,11 @@ public class ReminderService {
     }
 
     private void addReminder(UUID threadId, Reminder reminder) {
-        Instant instant = new Date().toInstant();
-        reminder.setLastUpdated(instant);
         reminder.setThreadId(threadId);
         reminder = reminderRepository.save(reminder);
-        notificationService.generateNotifications(reminder);
+        Instant lastNotificationDate = notificationService.generateNotifications(reminder);
+        reminder.setLastNotificationDate(lastNotificationDate);
+        reminderRepository.save(reminder);
     }
 
     private void deleteReminder(Reminder reminder) {

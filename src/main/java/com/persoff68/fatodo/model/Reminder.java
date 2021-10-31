@@ -30,6 +30,6 @@ public class Reminder extends AbstractModel {
     private List<Integer> monthDays;
 
     @Indexed
-    private Instant lastUpdated;
+    private Instant lastNotificationDate;
 
 }

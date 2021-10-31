@@ -29,4 +29,9 @@ public class Notification extends AbstractModel {
     @NotNull
     private NotificationStatus status = NotificationStatus.CREATED;
 
+    public Notification(UUID reminderId, Instant date) {
+        this.reminderId = reminderId;
+        this.date = date;
+    }
+
 }
