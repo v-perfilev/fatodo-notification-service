@@ -11,6 +11,6 @@ public interface ReminderMapper {
 
     ReminderDTO pojoToDTO(Reminder reminder);
 
-    Reminder vmToPojo(ReminderVM reminderVM);
+    Reminder dtoToPojo(ReminderDTO reminderDTO);
 
 }

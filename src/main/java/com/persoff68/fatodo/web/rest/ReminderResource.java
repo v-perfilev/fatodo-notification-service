@@ -4,7 +4,6 @@ import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.dto.ReminderDTO;
 import com.persoff68.fatodo.model.mapper.ReminderMapper;
 import com.persoff68.fatodo.service.ReminderService;
-import com.persoff68.fatodo.web.rest.vm.ReminderVM;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,9 +41,9 @@ public class ReminderResource {
 
     @PutMapping(value = "/{targetId}")
     public ResponseEntity<Void> setReminders(@PathVariable UUID targetId,
-                                             @Valid @RequestBody List<ReminderVM> reminderVMList) {
-        List<Reminder> reminderList = reminderVMList.stream()
-                .map(reminderMapper::vmToPojo)
+                                             @Valid @RequestBody List<ReminderDTO> reminderDTOList) {
+        List<Reminder> reminderList = reminderDTOList.stream()
+                .map(reminderMapper::dtoToPojo)
                 .collect(Collectors.toList());
         reminderService.setReminders(targetId, reminderList);
         return ResponseEntity.status(HttpStatus.CREATED).build();
