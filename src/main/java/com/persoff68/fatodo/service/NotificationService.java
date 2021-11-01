@@ -30,6 +30,17 @@ public class NotificationService {
     private final SendingService sendingService;
     private final NotificationRepository notificationRepository;
 
+    public void sendNotifications() {
+        List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), TO_SEND_LIMIT);
+        setNotificationsToPending(notificationList);
+        notificationList.forEach(sendingService::sendNotification);
+        setNotificationsToSent(notificationList);
+    }
+
+    public void deleteSentNotifications() {
+        notificationRepository.deleteSent();
+    }
+
     public Instant generateNotifications(Reminder reminder) {
         Periodicity periodicity = reminder.getPeriodicity();
         List<Notification> notificationList = switch (periodicity) {
@@ -48,17 +59,6 @@ public class NotificationService {
     public void deleteNotifications(Reminder reminder) {
         List<Notification> notificationList = notificationRepository.findAllByReminderId(reminder.getId());
         notificationRepository.deleteAll(notificationList);
-    }
-
-    public void deleteSentNotifications() {
-        notificationRepository.deleteSent();
-    }
-
-    public void sendNotifications() {
-        List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), TO_SEND_LIMIT);
-        setNotificationsToPending(notificationList);
-        notificationList.forEach(sendingService::sendNotification);
-        setNotificationsToSent(notificationList);
     }
 
     private List<Notification> createOnceNotification(Reminder reminder) {
