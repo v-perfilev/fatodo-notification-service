@@ -3,6 +3,7 @@ package com.persoff68.fatodo.service;
 import com.persoff68.fatodo.model.DateParams;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
+import com.persoff68.fatodo.model.constant.NotificationStatus;
 import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.service.exception.ReminderException;
@@ -22,9 +23,11 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+    private static final int TO_SEND_LIMIT = 100;
     private static final int WEEK_CALCULATION_PERIOD = 7;
     private static final int MONTH_CALCULATION_PERIOD = 31;
 
+    private final SendingService sendingService;
     private final NotificationRepository notificationRepository;
 
     public Instant generateNotifications(Reminder reminder) {
@@ -45,6 +48,17 @@ public class NotificationService {
     public void deleteNotifications(Reminder reminder) {
         List<Notification> notificationList = notificationRepository.findAllByReminderId(reminder.getId());
         notificationRepository.deleteAll(notificationList);
+    }
+
+    public void deleteSentNotifications() {
+        notificationRepository.deleteSent();
+    }
+
+    public void sendNotifications() {
+        List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), TO_SEND_LIMIT);
+        setNotificationsToPending(notificationList);
+        notificationList.forEach(sendingService::sendNotification);
+        setNotificationsToSent(notificationList);
     }
 
     private List<Notification> createOnceNotification(Reminder reminder) {
@@ -87,6 +101,16 @@ public class NotificationService {
         Instant instant = DateUtils.createYearlyInstant(params);
         Notification notification = new Notification(reminder.getId(), instant);
         return Collections.singletonList(notification);
+    }
+
+    private void setNotificationsToPending(List<Notification> notificationList) {
+        notificationList.forEach(n -> n.setStatus(NotificationStatus.PENDING));
+        notificationRepository.saveAll(notificationList);
+    }
+
+    private void setNotificationsToSent(List<Notification> notificationList) {
+        notificationList.forEach(n -> n.setStatus(NotificationStatus.SENT));
+        notificationRepository.saveAll(notificationList);
     }
 
     private Predicate<Instant> weekDaysFilter(List<Integer> weekDays) {

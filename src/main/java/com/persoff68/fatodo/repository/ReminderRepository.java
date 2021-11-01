@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,5 +28,8 @@ public interface ReminderRepository extends MongoRepository<Reminder, UUID> {
     @Override
     @CacheEvictMethod(cacheName = "reminders-by-thread-id", key = "#reminder.threadId")
     void delete(@Nonnull Reminder reminder);
+
+    @Query(value = "{ 'lastNotificationDate': {$lt: ?0}, 'locked': 'false' }, $limit: $1")
+    List<Reminder> findAllExpired(Instant date, int limit);
 
 }

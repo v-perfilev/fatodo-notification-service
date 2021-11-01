@@ -13,6 +13,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ReminderService {
+    private static final int EXPIRED_LIMIT = 100;
 
     private final ReminderThreadService threadService;
     private final NotificationService notificationService;
@@ -36,6 +37,13 @@ public class ReminderService {
         oldReminderList.forEach(this::deleteReminder);
     }
 
+    public void recalculateExpiredReminders() {
+        List<Reminder> reminderList = reminderRepository.findAllExpired(Instant.now(), EXPIRED_LIMIT);
+        lockReminders(reminderList);
+        reminderList.forEach(this::updateReminder);
+        unlockReminders(reminderList);
+    }
+
     private void addReminder(UUID threadId, Reminder reminder) {
         reminder.setThreadId(threadId);
         reminder = reminderRepository.save(reminder);
@@ -44,9 +52,25 @@ public class ReminderService {
         reminderRepository.save(reminder);
     }
 
+    private void updateReminder(Reminder reminder) {
+        Instant lastNotificationDate = notificationService.generateNotifications(reminder);
+        reminder.setLastNotificationDate(lastNotificationDate);
+        reminderRepository.save(reminder);
+    }
+
     private void deleteReminder(Reminder reminder) {
         reminderRepository.delete(reminder);
         notificationService.deleteNotifications(reminder);
+    }
+
+    private void lockReminders(List<Reminder> reminderList) {
+        reminderList.forEach(r -> r.setLocked(true));
+        reminderRepository.saveAll(reminderList);
+    }
+
+    private void unlockReminders(List<Reminder> reminderList) {
+        reminderList.forEach(r -> r.setLocked(false));
+        reminderRepository.saveAll(reminderList);
     }
 
 }

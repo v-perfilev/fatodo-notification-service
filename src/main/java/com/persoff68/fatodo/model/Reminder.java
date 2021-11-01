@@ -31,5 +31,7 @@ public class Reminder extends AbstractModel {
 
     @Indexed
     private Instant lastNotificationDate;
+    @Indexed
+    private boolean locked = false;
 
 }
