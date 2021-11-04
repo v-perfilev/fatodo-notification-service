@@ -33,7 +33,7 @@ public class NotificationService {
     public void sendNotifications() {
         List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), TO_SEND_LIMIT);
         setNotificationsToPending(notificationList);
-        notificationList.forEach(sendingService::sendNotification);
+        notificationList.parallelStream().forEach(sendingService::sendNotification);
         setNotificationsToSent(notificationList);
     }
 

@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.client;
 
+import com.persoff68.fatodo.model.ReminderMessage;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,4 +27,7 @@ public interface ItemServiceClient {
 
     @GetMapping(value = "/api/members/item/{itemId}/ids")
     List<UUID> getUserIdsByItemId(@PathVariable UUID itemId);
+
+    @GetMapping(value = "/api/reminders/item/{itemId}")
+    ReminderMessage getReminderByItemId(@PathVariable UUID itemId);
 }
