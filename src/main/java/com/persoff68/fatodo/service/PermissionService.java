@@ -41,7 +41,7 @@ public class PermissionService {
 
     private void checkItemEditPermission(ReminderThread thread) {
         UUID targetId = thread.getTargetId();
-        boolean hasPermission = itemServiceClient.canReadItem(targetId);
+        boolean hasPermission = itemServiceClient.canEditItem(targetId);
         if (!hasPermission) {
             throw new PermissionException();
         }

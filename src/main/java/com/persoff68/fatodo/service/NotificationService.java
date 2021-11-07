@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -52,7 +53,7 @@ public class NotificationService {
         };
         notificationRepository.saveAll(notificationList);
         return periodicity.equals(Periodicity.ONCE)
-                ? Instant.MAX
+                ? ZonedDateTime.now().plusYears(100).toInstant()
                 : maxNotificationDate(notificationList);
     }
 

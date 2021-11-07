@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.persoff68.fatodo.FatodoNotificationServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestReminder;
+import com.persoff68.fatodo.builder.TestReminderDTO;
 import com.persoff68.fatodo.builder.TestReminderThread;
 import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.dto.ReminderDTO;
+import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -19,10 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FatodoNotificationServiceApplication.class)
@@ -38,6 +44,7 @@ public class ReminderResourceIT {
     private static final String ENDPOINT = "/api/reminders";
 
     private static final UUID TARGET_ID = UUID.randomUUID();
+    private static final UUID NEW_TARGET_ID = UUID.randomUUID();
     private static final UUID THREAD_ID = UUID.randomUUID();
 
     @Autowired
@@ -47,6 +54,8 @@ public class ReminderResourceIT {
     ReminderThreadRepository threadRepository;
     @Autowired
     ReminderRepository reminderRepository;
+    @Autowired
+    NotificationRepository notificationRepository;
     @Autowired
     ObjectMapper objectMapper;
 
@@ -102,6 +111,79 @@ public class ReminderResourceIT {
     public void testGetAllByTargetId_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + TARGET_ID;
         mvc.perform(get(url))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    public void testSetReminders_ok_update() throws Exception {
+        when(itemServiceClient.canEditItem(any())).thenReturn(true);
+        String url = ENDPOINT + "/" + TARGET_ID;
+        ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
+        List<ReminderDTO> dtoList = Collections.singletonList(dto);
+        String requestBody = objectMapper.writeValueAsString(dtoList);
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isCreated());
+        List<Reminder> reminderList = reminderRepository.findAll();
+        List<Notification> notificationList = notificationRepository.findAll();
+        assertThat(reminderList).hasSize(1);
+        assertThat(notificationList).isNotEmpty();
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    public void testSetReminders_ok_create() throws Exception {
+        when(itemServiceClient.canEditItem(any())).thenReturn(true);
+        when(itemServiceClient.isItem(any())).thenReturn(true);
+        String url = ENDPOINT + "/" + NEW_TARGET_ID;
+        ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
+        List<ReminderDTO> dtoList = Collections.singletonList(dto);
+        String requestBody = objectMapper.writeValueAsString(dtoList);
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    public void testSetReminders_notFound() throws Exception {
+        when(itemServiceClient.isItem(any())).thenReturn(false);
+        String url = ENDPOINT + "/" + UUID.randomUUID();
+        ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
+        List<ReminderDTO> dtoList = Collections.singletonList(dto);
+        String requestBody = objectMapper.writeValueAsString(dtoList);
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isNotFound());
+        List<Reminder> reminderList = reminderRepository.findAll();
+        List<Notification> notificationList = notificationRepository.findAll();
+        assertThat(reminderList).hasSize(1);
+        assertThat(notificationList).isNotEmpty();
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    public void testSetReminders_forbidden() throws Exception {
+        when(itemServiceClient.canEditItem(any())).thenReturn(false);
+        String url = ENDPOINT + "/" + TARGET_ID;
+        ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
+        List<ReminderDTO> dtoList = Collections.singletonList(dto);
+        String requestBody = objectMapper.writeValueAsString(dtoList);
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void testSetReminders_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + TARGET_ID;
+        ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
+        List<ReminderDTO> dtoList = Collections.singletonList(dto);
+        String requestBody = objectMapper.writeValueAsString(dtoList);
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
                 .andExpect(status().isUnauthorized());
     }
 
