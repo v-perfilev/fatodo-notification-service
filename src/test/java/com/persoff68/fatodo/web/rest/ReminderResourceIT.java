@@ -34,6 +34,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -184,6 +185,42 @@ public class ReminderResourceIT {
         String requestBody = objectMapper.writeValueAsString(dtoList);
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    public void testDeleteReminders_ok() throws Exception {
+        when(itemServiceClient.canEditItem(any())).thenReturn(true);
+        String url = ENDPOINT + "/" + TARGET_ID;
+        mvc.perform(delete(url))
+                .andExpect(status().isOk());
+        List<Reminder> reminderList = reminderRepository.findAll();
+        assertThat(reminderList).isEmpty();
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    public void testDeleteReminders_notFound() throws Exception {
+        String url = ENDPOINT + "/" + UUID.randomUUID();
+        mvc.perform(delete(url))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    public void testDeleteReminders_forbidden() throws Exception {
+        when(itemServiceClient.canEditItem(any())).thenReturn(false);
+        String url = ENDPOINT + "/" + TARGET_ID;
+        mvc.perform(delete(url))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void testDeleteReminders_unauthorized() throws Exception {
+        String url = ENDPOINT + "/" + TARGET_ID;
+        mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());
     }
 
