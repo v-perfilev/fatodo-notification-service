@@ -55,7 +55,7 @@ public class SendingService {
     }
 
     private ReminderThread getThread(Notification notification) {
-        UUID reminderId = notification.getId();
+        UUID reminderId = notification.getReminderId();
         Reminder reminder = reminderRepository.findById(reminderId)
                 .orElseThrow(ModelNotFoundException::new);
         UUID threadId = reminder.getThreadId();

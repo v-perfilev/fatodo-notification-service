@@ -15,12 +15,12 @@ public class ReminderTask {
     private final ReminderService reminderService;
     private final NotificationService notificationService;
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 10000, initialDelay = 10000)
     public void sendNotifications() {
         notificationService.sendNotifications();
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 60000, initialDelay = 10000)
     public void recalculateExpiredReminders() {
         reminderService.recalculateExpiredReminders();
     }

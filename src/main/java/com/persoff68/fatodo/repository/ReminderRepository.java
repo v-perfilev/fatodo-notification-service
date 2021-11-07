@@ -29,7 +29,10 @@ public interface ReminderRepository extends MongoRepository<Reminder, UUID> {
     @CacheEvictMethod(cacheName = "reminders-by-thread-id", key = "#reminder.threadId")
     void delete(@Nonnull Reminder reminder);
 
-    @Query(value = "{ 'lastNotificationDate': {$lt: ?0}, 'locked': 'false' }, $limit: $1")
+    //    @Query(value = "{ 'lastNotificationDate': {$lt: ?0}, 'locked': 'false' }, $limit: $1")
+//    @Query(value = "{ 'locked': 'false' }")
+//    @Query(value = "{ 'lastNotificationDate': {$lt: ?0}, 'locked': 'false' }, $limit: $1")
+    @Query(value = "{ 'lastNotificationDate': {$lt: ?0}, 'locked': false }, $limit: $1")
     List<Reminder> findAllExpired(Instant date, int limit);
 
 }
