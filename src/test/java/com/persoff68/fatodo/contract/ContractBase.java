@@ -17,6 +17,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMessageVerifier
 public abstract class ContractBase {
@@ -46,6 +49,9 @@ public abstract class ContractBase {
         threadRepository.save(thread);
         Reminder reminder = TestReminder.defaultBuilder().threadId(threadId).build();
         reminderRepository.save(reminder);
+
+        when(itemServiceClient.canEditItem(any())).thenReturn(true);
+        when(itemServiceClient.canReadItem(any())).thenReturn(true);
     }
 
 }
