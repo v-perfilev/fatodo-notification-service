@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "mail-service", primary = false)
 public interface MailServiceClient {
 
-    @PostMapping(value = "/notification")
+    @PostMapping(value = "/api/mails/notification")
     void sendNotification(@RequestBody NotificationMail notificationMail);
 
 }
