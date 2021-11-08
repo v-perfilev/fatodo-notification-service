@@ -21,7 +21,7 @@ Contract.make {
         body([
                 [
                         "periodicity": $(
-                                consumer(any()),
+                                consumer(anyNonEmptyString()),
                                 producer("ONCE")
                         ),
                         "date"       : [
@@ -41,15 +41,7 @@ Contract.make {
                                         consumer(anyNumber()),
                                         producer(2030)
                                 ),
-                        ],
-                        "weekDays"   : $(
-                                consumer(any()),
-                                producer([])
-                        ),
-                        "monthDays"  : $(
-                                consumer(any()),
-                                producer([])
-                        )
+                        ]
                 ]
         ])
     }
