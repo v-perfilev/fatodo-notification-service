@@ -44,12 +44,14 @@ public class NotificationService {
 
     public Instant generateNotifications(Reminder reminder) {
         Periodicity periodicity = reminder.getPeriodicity();
-        List<Notification> notificationList = switch (periodicity) {
+        List<Notification> notificationList;
+        notificationList = switch (periodicity) {
             case ONCE -> createOnceNotification(reminder);
             case DAILY -> createDailyNotifications(reminder);
             case WEEKLY -> createWeeklyNotifications(reminder);
             case MONTHLY -> createMonthlyNotifications(reminder);
             case YEARLY -> createYearlyNotifications(reminder);
+            default -> throw new ReminderException();
         };
         notificationRepository.saveAll(notificationList);
         return periodicity.equals(Periodicity.ONCE)
