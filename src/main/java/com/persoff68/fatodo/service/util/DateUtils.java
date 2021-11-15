@@ -4,6 +4,7 @@ import com.persoff68.fatodo.model.DateParams;
 
 import java.time.Instant;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class DateUtils {
     private static final int MINUTES_IN_HOUR = 60;
@@ -18,13 +19,13 @@ public class DateUtils {
         int time = dateParams.getTime();
         int hours = getHours(time);
         int minutes = getMinutes(time);
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.set(year, month, date, hours, minutes);
         return calendar.toInstant();
     }
 
     public static Instant createRelativeInstant(DateParams dateParams, int addDays) {
-        Calendar today = Calendar.getInstance();
+        Calendar today = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         today.add(Calendar.DAY_OF_MONTH, addDays);
         int date = today.get(Calendar.DAY_OF_MONTH);
         int month = today.get(Calendar.MONTH);
@@ -33,7 +34,7 @@ public class DateUtils {
         int hours = getHours(time);
         int minutes = getMinutes(time);
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.set(year, month, date, hours, minutes);
         return calendar.toInstant();
     }
@@ -45,10 +46,10 @@ public class DateUtils {
         int hours = getHours(time);
         int minutes = getMinutes(time);
 
-        Calendar today = Calendar.getInstance();
+        Calendar today = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         int year = today.get(Calendar.YEAR);
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.set(year, month, date, hours, minutes);
         if (today.compareTo(calendar) > 0) {
             calendar.set(Calendar.YEAR, year + 1);
