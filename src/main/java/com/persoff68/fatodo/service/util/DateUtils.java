@@ -52,7 +52,6 @@ public class DateUtils {
 
         Calendar calendar = createGmtCalendar();
         calendar.set(year, month, date, hours, minutes);
-        addConditionalDateOffset(dateParams, calendar);
         addConditionalYearOffset(today, year, calendar);
         return calendar.toInstant();
     }
