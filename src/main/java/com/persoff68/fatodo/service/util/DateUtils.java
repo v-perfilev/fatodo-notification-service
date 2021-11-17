@@ -13,19 +13,22 @@ public class DateUtils {
     }
 
     public static Instant createInstant(DateParams dateParams) {
+        String timezone = dateParams.getTimezone();
         int date = dateParams.getDate();
         int month = dateParams.getMonth();
         int year = dateParams.getYear();
         int time = dateParams.getTime();
         int hours = getHours(time);
         int minutes = getMinutes(time);
-        Calendar calendar = createGmtCalendar();
+        Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes);
         return calendar.toInstant();
     }
 
     public static Instant createRelativeInstant(DateParams dateParams, int addDays) {
-        Calendar today = createGmtCalendar();
+        String timezone = dateParams.getTimezone();
+
+        Calendar today = createCalendar(timezone);
         today.add(Calendar.DAY_OF_MONTH, addDays);
         int date = today.get(Calendar.DAY_OF_MONTH);
         int month = today.get(Calendar.MONTH);
@@ -34,23 +37,24 @@ public class DateUtils {
         int hours = getHours(time);
         int minutes = getMinutes(time);
 
-        Calendar calendar = createGmtCalendar();
+        Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes);
-        addConditionalDateOffset(dateParams, calendar);
         return calendar.toInstant();
     }
 
     public static Instant createYearlyInstant(DateParams dateParams) {
+        String timezone = dateParams.getTimezone();
+
         int date = dateParams.getDate();
         int month = dateParams.getMonth();
         int time = dateParams.getTime();
         int hours = getHours(time);
         int minutes = getMinutes(time);
 
-        Calendar today = createGmtCalendar();
+        Calendar today = createCalendar(timezone);
         int year = today.get(Calendar.YEAR);
 
-        Calendar calendar = createGmtCalendar();
+        Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes);
         addConditionalYearOffset(today, year, calendar);
         return calendar.toInstant();
@@ -64,21 +68,14 @@ public class DateUtils {
         return time % MINUTES_IN_HOUR;
     }
 
-    private static void addConditionalDateOffset(DateParams dateParams, Calendar calendar) {
-        int dateOffset = dateParams.getDateOffset();
-        if (dateOffset != 0) {
-            calendar.add(Calendar.DATE, dateOffset);
-        }
-    }
-
     private static void addConditionalYearOffset(Calendar today, int year, Calendar calendar) {
         if (today.compareTo(calendar) > 0) {
             calendar.set(Calendar.YEAR, year + 1);
         }
     }
 
-    private static Calendar createGmtCalendar() {
-        return Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+    private static Calendar createCalendar(String timezone) {
+        return Calendar.getInstance(TimeZone.getTimeZone(timezone));
     }
 
 }
