@@ -4,6 +4,7 @@ import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -38,7 +39,8 @@ public class ReminderService {
     }
 
     public void recalculateExpiredReminders() {
-        List<Reminder> reminderList = reminderRepository.findAllExpired(Instant.now(), EXPIRED_LIMIT);
+        PageRequest request = PageRequest.of(0, EXPIRED_LIMIT);
+        List<Reminder> reminderList = reminderRepository.findAllExpired(Instant.now(), request);
         lockReminders(reminderList);
         reminderList.forEach(this::updateReminder);
         unlockReminders(reminderList);

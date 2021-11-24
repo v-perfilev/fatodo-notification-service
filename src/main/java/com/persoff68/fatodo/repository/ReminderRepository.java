@@ -4,6 +4,7 @@ import com.mongodb.lang.NonNull;
 import com.persoff68.fatodo.config.aop.cache.annotation.CacheEvictMethod;
 import com.persoff68.fatodo.config.aop.cache.annotation.CacheableMethod;
 import com.persoff68.fatodo.model.Reminder;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -29,7 +30,7 @@ public interface ReminderRepository extends MongoRepository<Reminder, UUID> {
     @CacheEvictMethod(cacheName = "reminders-by-thread-id", key = "#reminder.threadId")
     void delete(@Nonnull Reminder reminder);
 
-    @Query(value = "{ 'lastNotificationDate': {$lt: ?0}, 'locked': false }, $limit: $1")
-    List<Reminder> findAllExpired(Instant date, int limit);
+    @Query(value = "{ 'lastNotificationDate': {$lt: ?0}, 'locked': false }")
+    List<Reminder> findAllExpired(Instant date, Pageable pageable);
 
 }

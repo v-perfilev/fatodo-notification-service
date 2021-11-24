@@ -9,6 +9,7 @@ import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.service.exception.ReminderException;
 import com.persoff68.fatodo.service.util.DateUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -32,7 +33,8 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public void sendNotifications() {
-        List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), TO_SEND_LIMIT);
+        PageRequest request = PageRequest.of(0, TO_SEND_LIMIT);
+        List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), request);
         setNotificationsToPending(notificationList);
         notificationList.parallelStream().forEach(sendingService::sendNotification);
         setNotificationsToSent(notificationList);

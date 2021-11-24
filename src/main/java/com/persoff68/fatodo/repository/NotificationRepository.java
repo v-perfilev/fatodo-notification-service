@@ -1,6 +1,7 @@
 package com.persoff68.fatodo.repository;
 
 import com.persoff68.fatodo.model.Notification;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -18,7 +19,7 @@ public interface NotificationRepository extends MongoRepository<Notification, UU
     @Query(value = "{ 'status' : 'SENT' }", delete = true)
     void deleteSent();
 
-    @Query(value = "{ 'date': {$lt: ?0}, 'status': 'CREATED' }, $limit: $1")
-    List<Notification> findAllToSend(Instant date, int limit);
+    @Query(value = "{ 'date': {$lt: ?0}, 'status': 'CREATED' }")
+    List<Notification> findAllToSend(Instant date, Pageable pageable);
 
 }
