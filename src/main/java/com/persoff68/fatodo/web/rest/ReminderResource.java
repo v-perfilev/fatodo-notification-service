@@ -41,7 +41,7 @@ public class ReminderResource {
 
     @PutMapping(value = "/{targetId}")
     public ResponseEntity<Void> setReminders(@PathVariable UUID targetId,
-                                             @Valid @RequestBody List<ReminderDTO> reminderDTOList) {
+                                             @RequestBody List<ReminderDTO> reminderDTOList) {
         List<Reminder> reminderList = reminderDTOList.stream()
                 .map(reminderMapper::dtoToPojo)
                 .collect(Collectors.toList());

@@ -136,7 +136,11 @@ public class NotificationService {
         return notificationList.stream()
                 .map(Notification::getDate)
                 .max(Comparator.naturalOrder())
-                .orElseThrow(ReminderException::new);
+                .orElse(createInstantPlusWeek());
+    }
+
+    private Instant createInstantPlusWeek() {
+        return ZonedDateTime.now().plusWeeks(1).toInstant();
     }
 
 }
