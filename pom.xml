@@ -26,6 +26,7 @@
         <contract.package>com.persoff68.fatodo.contract</contract.package>
         <!-- Dependency versions -->
         <java.version>17</java.version>
+        <spring-boot.version>2.6.7</spring-boot.version>
         <spring-cloud.version>2021.0.2</spring-cloud.version>
         <jackson.version>2.13.2.2</jackson.version>
         <jackson-guava.version>2.13.2</jackson-guava.version>
