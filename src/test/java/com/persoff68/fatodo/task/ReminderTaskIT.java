@@ -38,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = FatodoNotificationServiceApplication.class)
-public class ReminderTaskIT {
+class ReminderTaskIT {
 
     private static final UUID TARGET_ID = UUID.randomUUID();
     private static final UUID THREAD_ID = UUID.randomUUID();
@@ -62,7 +62,7 @@ public class ReminderTaskIT {
     MailServiceClient mailServiceClient;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         ReminderThread thread = TestReminderThread.defaultBuilder().id(THREAD_ID).targetId(TARGET_ID).build();
         threadRepository.save(thread);
 
@@ -73,14 +73,14 @@ public class ReminderTaskIT {
     }
 
     @AfterEach
-    public void cleanup() {
+    void cleanup() {
         notificationRepository.deleteAll();
         reminderRepository.deleteAll();
         threadRepository.deleteAll();
     }
 
     @Test
-    public void testSendNotifications() {
+    void testSendNotifications() {
 
         Instant instant = Instant.now().minusSeconds(10);
         Reminder reminder = TestReminder.defaultBuilder()
@@ -102,7 +102,7 @@ public class ReminderTaskIT {
     }
 
     @Test
-    public void testRecalculateExpiredReminders() {
+    void testRecalculateExpiredReminders() {
         Instant instant = Instant.now().minusSeconds(10);
         Reminder reminder = TestReminder.defaultBuilder()
                 .id(REMINDER_ID).threadId(THREAD_ID)
@@ -116,7 +116,7 @@ public class ReminderTaskIT {
     }
 
     @Test
-    public void testDeleteSentNotifications() {
+    void testDeleteSentNotifications() {
         Instant instant = Instant.now().minusMillis(1000);
         Reminder reminder = TestReminder.defaultBuilder()
                 .id(REMINDER_ID).threadId(THREAD_ID)

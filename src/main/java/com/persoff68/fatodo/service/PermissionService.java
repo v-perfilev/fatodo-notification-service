@@ -17,17 +17,19 @@ public class PermissionService {
 
     public void checkThreadReadPermission(ReminderThread thread) {
         ReminderThreadType type = thread.getType();
-        switch (type) {
-            case ITEM -> checkItemReadPermission(thread);
-            default -> throw new PermissionException();
+        if (type == ReminderThreadType.ITEM) {
+            checkItemReadPermission(thread);
+        } else {
+            throw new PermissionException();
         }
     }
 
     public void checkThreadEditPermission(ReminderThread thread) {
         ReminderThreadType type = thread.getType();
-        switch (type) {
-            case ITEM -> checkItemEditPermission(thread);
-            default -> throw new PermissionException();
+        if (type == ReminderThreadType.ITEM) {
+            checkItemEditPermission(thread);
+        } else {
+            throw new PermissionException();
         }
     }
 

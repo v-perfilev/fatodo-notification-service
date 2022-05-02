@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(ReminderResource.ENDPOINT)
@@ -34,7 +33,7 @@ public class ReminderResource {
         List<Reminder> reminderList = reminderService.getAllByTargetId(targetId);
         List<ReminderDTO> dtoList = reminderList.stream()
                 .map(reminderMapper::pojoToDTO)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(dtoList);
     }
 
@@ -43,7 +42,7 @@ public class ReminderResource {
                                              @RequestBody List<ReminderDTO> reminderDTOList) {
         List<Reminder> reminderList = reminderDTOList.stream()
                 .map(reminderMapper::dtoToPojo)
-                .collect(Collectors.toList());
+                .toList();
         reminderService.setReminders(targetId, reminderList);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

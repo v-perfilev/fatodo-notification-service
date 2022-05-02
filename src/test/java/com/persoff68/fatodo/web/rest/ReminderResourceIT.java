@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(classes = FatodoNotificationServiceApplication.class)
 @AutoConfigureMockMvc
-public class ReminderResourceIT {
+class ReminderResourceIT {
     private static final String ENDPOINT = "/api/reminders";
 
     private static final UUID TARGET_ID = UUID.randomUUID();
@@ -64,7 +64,7 @@ public class ReminderResourceIT {
     ItemServiceClient itemServiceClient;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         ReminderThread thread = TestReminderThread.defaultBuilder().id(THREAD_ID).targetId(TARGET_ID).build();
         threadRepository.save(thread);
         Reminder reminder = TestReminder.defaultBuilder().threadId(THREAD_ID).build();
@@ -72,27 +72,28 @@ public class ReminderResourceIT {
     }
 
     @AfterEach
-    public void cleanup() {
+    void cleanup() {
         reminderRepository.deleteAll();
         threadRepository.deleteAll();
     }
 
     @Test
     @WithCustomSecurityContext
-    public void testGetAllByTargetId_ok() throws Exception {
+    void testGetAllByTargetId_ok() throws Exception {
         when(itemServiceClient.canReadItem(any())).thenReturn(true);
         String url = ENDPOINT + "/" + TARGET_ID;
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, ReminderDTO.class);
+        CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class,
+                ReminderDTO.class);
         List<ReminderDTO> resultList = objectMapper.readValue(resultString, collectionType);
-        assertThat(resultList.size()).isEqualTo(1);
+        assertThat(resultList).hasSize(1);
     }
 
     @Test
     @WithCustomSecurityContext
-    public void testGetAllByTargetId_notFound() throws Exception {
+    void testGetAllByTargetId_notFound() throws Exception {
         String url = ENDPOINT + "/" + UUID.randomUUID();
         mvc.perform(get(url))
                 .andExpect(status().isNotFound());
@@ -100,7 +101,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testGetAllByTargetId_forbidden() throws Exception {
+    void testGetAllByTargetId_forbidden() throws Exception {
         when(itemServiceClient.canReadItem(any())).thenReturn(false);
         String url = ENDPOINT + "/" + TARGET_ID;
         mvc.perform(get(url))
@@ -109,7 +110,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithAnonymousUser
-    public void testGetAllByTargetId_unauthorized() throws Exception {
+    void testGetAllByTargetId_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + TARGET_ID;
         mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
@@ -117,7 +118,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testSetReminders_ok_update() throws Exception {
+    void testSetReminders_ok_update() throws Exception {
         when(itemServiceClient.canEditItem(any())).thenReturn(true);
         String url = ENDPOINT + "/" + TARGET_ID;
         ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
@@ -134,7 +135,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testSetReminders_ok_create() throws Exception {
+    void testSetReminders_ok_create() throws Exception {
         when(itemServiceClient.canEditItem(any())).thenReturn(true);
         when(itemServiceClient.isItem(any())).thenReturn(true);
         String url = ENDPOINT + "/" + NEW_TARGET_ID;
@@ -148,7 +149,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testSetReminders_notFound() throws Exception {
+    void testSetReminders_notFound() throws Exception {
         when(itemServiceClient.isItem(any())).thenReturn(false);
         String url = ENDPOINT + "/" + UUID.randomUUID();
         ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
@@ -165,7 +166,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testSetReminders_forbidden() throws Exception {
+    void testSetReminders_forbidden() throws Exception {
         when(itemServiceClient.canEditItem(any())).thenReturn(false);
         String url = ENDPOINT + "/" + TARGET_ID;
         ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
@@ -178,7 +179,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithAnonymousUser
-    public void testSetReminders_unauthorized() throws Exception {
+    void testSetReminders_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + TARGET_ID;
         ReminderDTO dto = TestReminderDTO.defaultBuilder().build();
         List<ReminderDTO> dtoList = Collections.singletonList(dto);
@@ -190,7 +191,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testDeleteReminders_ok() throws Exception {
+    void testDeleteReminders_ok() throws Exception {
         when(itemServiceClient.canEditItem(any())).thenReturn(true);
         String url = ENDPOINT + "/" + TARGET_ID;
         mvc.perform(delete(url))
@@ -201,7 +202,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testDeleteReminders_notFound() throws Exception {
+    void testDeleteReminders_notFound() throws Exception {
         String url = ENDPOINT + "/" + UUID.randomUUID();
         mvc.perform(delete(url))
                 .andExpect(status().isNotFound());
@@ -209,7 +210,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithCustomSecurityContext
-    public void testDeleteReminders_forbidden() throws Exception {
+    void testDeleteReminders_forbidden() throws Exception {
         when(itemServiceClient.canEditItem(any())).thenReturn(false);
         String url = ENDPOINT + "/" + TARGET_ID;
         mvc.perform(delete(url))
@@ -218,7 +219,7 @@ public class ReminderResourceIT {
 
     @Test
     @WithAnonymousUser
-    public void testDeleteReminders_unauthorized() throws Exception {
+    void testDeleteReminders_unauthorized() throws Exception {
         String url = ENDPOINT + "/" + TARGET_ID;
         mvc.perform(delete(url))
                 .andExpect(status().isUnauthorized());

@@ -1,10 +1,13 @@
 package com.persoff68.fatodo.service.exception;
 
-public class ReminderException extends RuntimeException {
+import com.persoff68.fatodo.exception.AbstractException;
+import org.springframework.http.HttpStatus;
+
+public class ReminderException extends AbstractException {
     private static final String MESSAGE = "Wrong reminder params";
 
     public ReminderException() {
-        super(MESSAGE);
+        super(HttpStatus.INTERNAL_SERVER_ERROR, MESSAGE);
     }
 
 }

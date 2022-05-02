@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -78,7 +77,7 @@ public class NotificationService {
         return IntStream.rangeClosed(1, WEEK_CALCULATION_PERIOD)
                 .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
                 .map(instant -> new Notification(reminder.getId(), instant))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Notification> createWeeklyNotifications(Reminder reminder) {
@@ -88,7 +87,7 @@ public class NotificationService {
                 .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
                 .filter(weekDaysFilter(weekDays))
                 .map(instant -> new Notification(reminder.getId(), instant))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Notification> createMonthlyNotifications(Reminder reminder) {
@@ -98,7 +97,7 @@ public class NotificationService {
                 .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
                 .filter(monthDaysFilter(monthDays))
                 .map(instant -> new Notification(reminder.getId(), instant))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<Notification> createYearlyNotifications(Reminder reminder) {

@@ -5,12 +5,13 @@ import com.persoff68.fatodo.service.exception.ModelDuplicatedException;
 import com.persoff68.fatodo.service.exception.ModelInvalidException;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import com.persoff68.fatodo.service.exception.PermissionException;
+import com.persoff68.fatodo.service.exception.ReminderException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ServiceExceptionTest {
+class ServiceExceptionTest {
 
     @Test
     void testModelAlreadyExistsException_firstConstructor() {
@@ -100,6 +101,14 @@ public class ServiceExceptionTest {
         AbstractException abstractException = (AbstractException) exception;
         assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(abstractException.getFeedBackCode()).isEqualTo("permission.restricted");
+    }
+
+    @Test
+    void testReminderException() {
+        Object exception = new ReminderException();
+        assertThat(exception).isInstanceOf(AbstractException.class);
+        AbstractException abstractException = (AbstractException) exception;
+        assertThat(abstractException.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
