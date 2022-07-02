@@ -21,13 +21,13 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class SendingService {
+public class ClientService {
 
     private final ReminderThreadRepository threadRepository;
     private final ReminderRepository reminderRepository;
     private final ItemServiceClient itemServiceClient;
-    private final UserServiceClient userServiceClient;
     private final MailServiceClient mailServiceClient;
+    private final UserServiceClient userServiceClient;
 
     public void sendNotification(Notification notification) {
         ReminderThread thread = getThread(notification);

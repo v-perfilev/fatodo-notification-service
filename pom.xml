@@ -27,6 +27,7 @@
         <!-- Dependency versions -->
         <java.version>17</java.version>
         <spring-cloud.version>2021.0.2</spring-cloud.version>
+        <spring-kafka.version>2.8.7</spring-kafka.version>
         <caffeine.version>3.1.0</caffeine.version>
         <jackson.version>2.13.2.2</jackson.version>
         <jackson-guava.version>2.13.2</jackson-guava.version>
@@ -73,6 +74,12 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- Spring Kafka management -->
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
             </dependency>
             <!-- Mongock management -->
             <dependency>
@@ -162,6 +169,13 @@
                 <artifactId>de.flapdoodle.embed.mongo</artifactId>
                 <version>${embedded-mongo.version}</version>
             </dependency>
+
+            <!-- Spring Kafka Test management -->
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka-test</artifactId>
+                <version>${spring-kafka.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -221,6 +235,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Spring Kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
 
         <!-- Spring Boot Data MongoDB -->
@@ -351,6 +371,12 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-contract-stub-runner</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Spring Kafka Test -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

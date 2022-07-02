@@ -28,14 +28,14 @@ public class NotificationService {
     private static final int WEEK_CALCULATION_PERIOD = 7;
     private static final int MONTH_CALCULATION_PERIOD = 31;
 
-    private final SendingService sendingService;
+    private final ClientService clientService;
     private final NotificationRepository notificationRepository;
 
     public void sendNotifications() {
         PageRequest request = PageRequest.of(0, TO_SEND_LIMIT);
         List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), request);
         setNotificationsToPending(notificationList);
-        notificationList.parallelStream().forEach(sendingService::sendNotification);
+        notificationList.parallelStream().forEach(clientService::sendNotification);
         setNotificationsToSent(notificationList);
     }
 

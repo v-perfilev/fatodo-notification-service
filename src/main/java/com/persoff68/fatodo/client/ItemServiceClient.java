@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "item-service", primary = false)
+@FeignClient(name = "item-service", primary = false, qualifiers = {"feignItemServiceClient"})
 public interface ItemServiceClient {
 
     @GetMapping(value = "/api/permissions/item/read/{itemId}")

@@ -1,6 +1,5 @@
-package com.persoff68.fatodo.task;
+package com.persoff68.fatodo.kafka.producer;
 
-import com.persoff68.fatodo.FatodoNotificationServiceApplication;
 import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderMessage;
@@ -9,41 +8,59 @@ import com.persoff68.fatodo.builder.TestUserInfo;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.Notification;
+import com.persoff68.fatodo.model.NotificationMail;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderMessage;
 import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.UserInfo;
-import com.persoff68.fatodo.model.constant.NotificationStatus;
-import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
-import org.assertj.core.api.Condition;
+import com.persoff68.fatodo.task.ReminderTask;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.MessageListener;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = FatodoNotificationServiceApplication.class)
-class ReminderTaskIT {
+@SpringBootTest(properties = {
+        "kafka.bootstrapAddress=PLAINTEXT://localhost:9092",
+        "kafka.groupId=test",
+        "kafka.partitions=1"
+})
+@DirtiesContext
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+public class MailProducerIT {
 
     private static final UUID TARGET_ID = UUID.randomUUID();
     private static final UUID THREAD_ID = UUID.randomUUID();
     private static final UUID REMINDER_ID = UUID.randomUUID();
+
+    @Autowired
+    private EmbeddedKafkaBroker embeddedKafkaBroker;
 
     @Autowired
     ReminderTask reminderTask;
@@ -58,9 +75,14 @@ class ReminderTaskIT {
     @MockBean
     ItemServiceClient itemServiceClient;
     @MockBean
-    MailServiceClient mailServiceClient;
-    @MockBean
     UserServiceClient userServiceClient;
+
+    @SpyBean
+    MailServiceClient mailServiceClient;
+
+    private ConcurrentMessageListenerContainer<String, NotificationMail> notificationContainer;
+    private BlockingQueue<ConsumerRecord<String, NotificationMail>> notificationRecords;
+
 
     @BeforeEach
     void setup() {
@@ -71,7 +93,8 @@ class ReminderTaskIT {
         when(itemServiceClient.getReminderByItemId(any())).thenReturn(message);
         UserInfo userInfo = TestUserInfo.defaultBuilder().build();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
-        doNothing().when(mailServiceClient).sendNotification(any());
+
+        startNotificationConsumer();
     }
 
     @AfterEach
@@ -79,59 +102,38 @@ class ReminderTaskIT {
         notificationRepository.deleteAll();
         reminderRepository.deleteAll();
         threadRepository.deleteAll();
+
+        stopNotificationConsumer();
     }
 
     @Test
-    void testSendNotifications() {
-
+    void testSendNotifications() throws InterruptedException {
         Instant instant = Instant.now().minusSeconds(10);
-        Reminder reminder = TestReminder.defaultBuilder()
-                .id(REMINDER_ID).threadId(THREAD_ID).lastNotificationDate(instant).build();
+        Reminder reminder =
+                TestReminder.defaultBuilder().id(REMINDER_ID).threadId(THREAD_ID).lastNotificationDate(instant).build();
         reminderRepository.save(reminder);
-        Notification notification = TestNotification.defaultBuilder()
-                .reminderId(REMINDER_ID).date(instant).build();
+        Notification notification = TestNotification.defaultBuilder().reminderId(REMINDER_ID).date(instant).build();
         notificationRepository.save(notification);
 
         reminderTask.sendNotifications();
+        ConsumerRecord<String, NotificationMail> record = notificationRecords.poll(10, TimeUnit.SECONDS);
 
+        assertThat(mailServiceClient instanceof MailProducer).isTrue();
+        assertThat(record).isNotNull();
         verify(mailServiceClient).sendNotification(any());
-        List<Notification> notificationList = notificationRepository.findAll();
-        Condition<Notification> sentCondition = new Condition<>(
-                n -> n.getStatus().equals(NotificationStatus.SENT),
-                "notification is sent"
-        );
-        assertThat(notificationList).have(sentCondition);
     }
 
-    @Test
-    void testRecalculateExpiredReminders() {
-        Instant instant = Instant.now().minusSeconds(10);
-        Reminder reminder = TestReminder.defaultBuilder()
-                .id(REMINDER_ID).threadId(THREAD_ID)
-                .periodicity(Periodicity.DAILY).lastNotificationDate(instant).build();
-        reminderRepository.save(reminder);
-
-        reminderTask.recalculateExpiredReminders();
-
-        List<Notification> notificationList = notificationRepository.findAll();
-        assertThat(notificationList).isNotEmpty();
+    private void startNotificationConsumer() {
+        notificationContainer = KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test",
+                NotificationMail.class).createContainer("mail_notification");
+        notificationRecords = new LinkedBlockingQueue<>();
+        notificationContainer.setupMessageListener((MessageListener<String, NotificationMail>) notificationRecords::add);
+        notificationContainer.start();
+        ContainerTestUtils.waitForAssignment(notificationContainer, embeddedKafkaBroker.getPartitionsPerTopic());
     }
 
-    @Test
-    void testDeleteSentNotifications() {
-        Instant instant = Instant.now().minusMillis(1000);
-        Reminder reminder = TestReminder.defaultBuilder()
-                .id(REMINDER_ID).threadId(THREAD_ID)
-                .periodicity(Periodicity.DAILY).lastNotificationDate(instant).build();
-        reminderRepository.save(reminder);
-        Notification notification = TestNotification.defaultBuilder()
-                .reminderId(REMINDER_ID).status(NotificationStatus.SENT).build();
-        notificationRepository.save(notification);
-
-        reminderTask.deleteSentNotifications();
-
-        List<Notification> notificationList = notificationRepository.findAll();
-        assertThat(notificationList).isEmpty();
+    private void stopNotificationConsumer() {
+        notificationContainer.stop();
     }
 
 }
