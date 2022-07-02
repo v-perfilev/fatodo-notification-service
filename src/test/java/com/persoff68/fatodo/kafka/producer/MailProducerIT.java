@@ -1,5 +1,7 @@
 package com.persoff68.fatodo.kafka.producer;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderMessage;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.MessageListener;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
@@ -71,6 +74,8 @@ public class MailProducerIT {
     ReminderRepository reminderRepository;
     @Autowired
     NotificationRepository notificationRepository;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @MockBean
     ItemServiceClient itemServiceClient;
@@ -124,8 +129,10 @@ public class MailProducerIT {
     }
 
     private void startNotificationConsumer() {
-        notificationContainer = KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test",
-                NotificationMail.class).createContainer("mail_notification");
+        JavaType javaType = objectMapper.getTypeFactory().constructType(NotificationMail.class);
+        ConcurrentKafkaListenerContainerFactory<String, NotificationMail> notificationContainerFactory =
+                KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", javaType);
+        notificationContainer = notificationContainerFactory.createContainer("mail_notification");
         notificationRecords = new LinkedBlockingQueue<>();
         notificationContainer.setupMessageListener((MessageListener<String, NotificationMail>) notificationRecords::add);
         notificationContainer.start();

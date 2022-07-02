@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.config.util;
 
+import com.fasterxml.jackson.databind.JavaType;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -37,9 +38,8 @@ public class KafkaUtils {
     }
 
     public static <T> ConcurrentKafkaListenerContainerFactory<String, T> buildJsonContainerFactory(
-            String bootstrapAddress, String groupId, Class<T> clazz) {
-        ConsumerFactory<String, T> consumerFactory = buildJsonConsumerFactory(bootstrapAddress, groupId,
-                clazz);
+            String bootstrapAddress, String groupId, JavaType javaType) {
+        ConsumerFactory<String, T> consumerFactory = buildJsonConsumerFactory(bootstrapAddress, groupId, javaType);
         ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
         return factory;
@@ -57,14 +57,14 @@ public class KafkaUtils {
     }
 
     private static <T> ConsumerFactory<String, T> buildJsonConsumerFactory(
-            String bootstrapAddress, String groupId, Class<T> clazz) {
+            String bootstrapAddress, String groupId, JavaType javaType) {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         StringDeserializer keyDeserializer = new StringDeserializer();
-        JsonDeserializer<T> valueDeserializer = new JsonDeserializer<>(clazz);
+        JsonDeserializer<T> valueDeserializer = new JsonDeserializer<>(javaType);
         valueDeserializer.trustedPackages("*");
         valueDeserializer.setUseTypeHeaders(false);
         return new DefaultKafkaConsumerFactory<>(props, keyDeserializer, valueDeserializer);
