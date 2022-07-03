@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.kafka.producer;
+package com.persoff68.fatodo.web.kafka;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +52,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(properties = {
         "kafka.bootstrapAddress=PLAINTEXT://localhost:9092",
         "kafka.groupId=test",
-        "kafka.partitions=1"
+        "kafka.partitions=1",
+        "kafka.autoOffsetResetConfig=earliest"
 })
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})

@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.kafka.producer;
+package com.persoff68.fatodo.web.kafka;
 
 import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
