@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class ReminderService {
 
     public List<Reminder> getAllByTargetId(UUID targetId) {
         ReminderThread thread = threadService.getByTargetId(targetId);
-        return reminderRepository.findAllByThreadId(thread.getId());
+        return thread.getReminders();
     }
 
     public void setReminders(UUID targetId, List<Reminder> reminderList) {
@@ -32,15 +33,9 @@ public class ReminderService {
         reminderList.forEach(r -> addReminder(thread.getId(), r));
     }
 
-    public void deleteReminders(UUID targetId) {
-        ReminderThread thread = threadService.deleteByTargetId(targetId);
-        List<Reminder> oldReminderList = reminderRepository.findAllByThreadId(thread.getId());
-        oldReminderList.forEach(this::deleteReminder);
-    }
-
     public void recalculateExpiredReminders() {
         PageRequest request = PageRequest.of(0, EXPIRED_LIMIT);
-        List<Reminder> reminderList = reminderRepository.findAllExpired(Instant.now(), request);
+        List<Reminder> reminderList = reminderRepository.findAllExpired(new Date(), request);
         lockReminders(reminderList);
         reminderList.forEach(this::updateReminder);
         unlockReminders(reminderList);

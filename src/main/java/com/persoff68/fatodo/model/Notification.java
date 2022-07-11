@@ -5,32 +5,36 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.ToString;
 
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
-import java.util.UUID;
 
-@Document(collection = "ftd_notification")
+@Entity
+@Table(name = "ftd_reminder_notification")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"reminder"})
 public class Notification extends AbstractModel {
 
-    @NotNull
-    @Indexed
-    private UUID reminderId;
+    @ManyToOne
+    private Reminder reminder;
 
-    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
     private Instant date;
 
     @NotNull
     private NotificationStatus status = NotificationStatus.CREATED;
 
-    public Notification(UUID reminderId, Instant date) {
-        this.reminderId = reminderId;
+    public Notification(Reminder reminder, Instant date) {
+        this.reminder = reminder;
         this.date = date;
     }
 

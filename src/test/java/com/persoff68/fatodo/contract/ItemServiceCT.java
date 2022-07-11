@@ -2,12 +2,15 @@ package com.persoff68.fatodo.contract;
 
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.ReminderMessage;
+import com.persoff68.fatodo.model.TypeAndParent;
+import com.persoff68.fatodo.model.constant.ReminderThreadType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,9 +37,17 @@ class ItemServiceCT {
     }
 
     @Test
-    void testIsItem() {
-        boolean isItem = itemServiceClient.isItem(UUID.randomUUID());
-        assertThat(isItem).isTrue();
+    void testCanEditItems() {
+        List<UUID> itemIdList = Collections.singletonList(UUID.randomUUID());
+        boolean canRead = itemServiceClient.canEditItems(itemIdList);
+        assertThat(canRead).isTrue();
+    }
+
+    @Test
+    void testGetTypeAndParent() {
+        TypeAndParent typeAndParent = itemServiceClient.getTypeAndParent(UUID.randomUUID());
+        assertThat(typeAndParent.getType()).isEqualTo(ReminderThreadType.ITEM);
+        assertThat(typeAndParent.getParentId()).isNotNull();
     }
 
     @Test

@@ -5,28 +5,43 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.ToString;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.UUID;
 
-@Document(collection = "ftd_reminder_thread")
+@Entity
+@Table(name = "ftd_reminder_thread")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"reminders"})
 public class ReminderThread extends AbstractModel {
 
     @NotNull
-    @Indexed
+    private UUID parentId;
+
+    @NotNull
     private UUID targetId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     ReminderThreadType type;
 
-    public static ReminderThread of(UUID targetId, ReminderThreadType type) {
+    @OneToMany(mappedBy = "thread", cascade = {CascadeType.ALL})
+    private List<Reminder> reminders;
+
+    public static ReminderThread of(UUID parentId, UUID targetId, ReminderThreadType type) {
         ReminderThread thread = new ReminderThread();
+        thread.setParentId(parentId);
         thread.setTargetId(targetId);
         thread.setType(type);
         return thread;

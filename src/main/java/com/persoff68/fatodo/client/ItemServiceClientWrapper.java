@@ -2,6 +2,7 @@ package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
 import com.persoff68.fatodo.model.ReminderMessage;
+import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +42,22 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public boolean isItem(UUID itemId) {
+    public boolean canEditItems(List<UUID> itemIdList) {
         try {
-            return itemServiceClient.isItem(itemId);
+            return itemServiceClient.canEditItems(itemIdList);
+        } catch (FeignException.NotFound e) {
+            throw new ModelNotFoundException();
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
+    public TypeAndParent getTypeAndParent(UUID id) {
+        try {
+            return itemServiceClient.getTypeAndParent(id);
+        } catch (FeignException.NotFound e) {
+            throw new ModelNotFoundException();
         } catch (Exception e) {
             throw new ClientException();
         }

@@ -5,33 +5,42 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-@Document(collection = "ftd_reminder")
+@Entity
+@Table(name = "ftd_reminder")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
+@ToString(exclude = {"thread"})
 public class Reminder extends AbstractModel {
 
-    @NotNull
-    @Indexed
-    private UUID threadId;
+    @ManyToOne
+    private ReminderThread thread;
 
     private Periodicity periodicity;
     private DateParams date;
     private List<Integer> weekDays;
     private List<Integer> monthDays;
 
-    @Indexed
+    @Temporal(TemporalType.TIMESTAMP)
     private Instant lastNotificationDate;
-    @Indexed
-    private boolean locked = false;
+
+    private boolean locked;
+
+    @OneToMany(mappedBy = "reminder", cascade = {CascadeType.ALL})
+    private List<Notification> notifications;
 
 }

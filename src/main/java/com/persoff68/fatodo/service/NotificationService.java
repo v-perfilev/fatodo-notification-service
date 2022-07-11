@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -33,7 +34,7 @@ public class NotificationService {
 
     public void sendNotifications() {
         PageRequest request = PageRequest.of(0, TO_SEND_LIMIT);
-        List<Notification> notificationList = notificationRepository.findAllToSend(Instant.now(), request);
+        List<Notification> notificationList = notificationRepository.findAllToSend(new Date(), request);
         setNotificationsToPending(notificationList);
         notificationList.parallelStream().forEach(clientService::sendNotification);
         setNotificationsToSent(notificationList);
@@ -68,7 +69,7 @@ public class NotificationService {
     private List<Notification> createOnceNotification(Reminder reminder) {
         DateParams params = reminder.getDate();
         Instant instant = DateUtils.createInstant(params);
-        Notification notification = new Notification(reminder.getId(), instant);
+        Notification notification = new Notification(reminder, instant);
         return Collections.singletonList(notification);
     }
 
@@ -76,7 +77,7 @@ public class NotificationService {
         DateParams params = reminder.getDate();
         return IntStream.rangeClosed(1, WEEK_CALCULATION_PERIOD)
                 .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
-                .map(instant -> new Notification(reminder.getId(), instant))
+                .map(date -> new Notification(reminder, date))
                 .toList();
     }
 
@@ -86,7 +87,7 @@ public class NotificationService {
         return IntStream.rangeClosed(1, WEEK_CALCULATION_PERIOD)
                 .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
                 .filter(weekDaysFilter(weekDays))
-                .map(instant -> new Notification(reminder.getId(), instant))
+                .map(instant -> new Notification(reminder, instant))
                 .toList();
     }
 
@@ -96,14 +97,14 @@ public class NotificationService {
         return IntStream.rangeClosed(1, MONTH_CALCULATION_PERIOD)
                 .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
                 .filter(monthDaysFilter(monthDays))
-                .map(instant -> new Notification(reminder.getId(), instant))
+                .map(instant -> new Notification(reminder, instant))
                 .toList();
     }
 
     private List<Notification> createYearlyNotifications(Reminder reminder) {
         DateParams params = reminder.getDate();
         Instant instant = DateUtils.createYearlyInstant(params);
-        Notification notification = new Notification(reminder.getId(), instant);
+        Notification notification = new Notification(reminder, instant);
         return Collections.singletonList(notification);
     }
 
