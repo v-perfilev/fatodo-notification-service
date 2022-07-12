@@ -14,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,8 +37,8 @@ public class ReminderThread extends AbstractModel {
     @Enumerated(EnumType.STRING)
     ReminderThreadType type;
 
-    @OneToMany(mappedBy = "thread", cascade = {CascadeType.ALL})
-    private List<Reminder> reminders;
+    @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reminder> reminders = new ArrayList<>();
 
     public static ReminderThread of(UUID parentId, UUID targetId, ReminderThreadType type) {
         ReminderThread thread = new ReminderThread();

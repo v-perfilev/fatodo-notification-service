@@ -9,18 +9,26 @@ import java.util.UUID;
 public class TestReminderThread extends ReminderThread {
 
     @Builder
-    TestReminderThread(UUID id, UUID targetId, ReminderThreadType type) {
+    TestReminderThread(UUID parentId, UUID targetId, ReminderThreadType type) {
         super();
-        setId(id);
+        setParentId(parentId);
         setTargetId(targetId);
         setType(type);
     }
 
     public static TestReminderThreadBuilder defaultBuilder() {
         return TestReminderThread.builder()
-                .id(UUID.randomUUID())
+                .parentId(UUID.randomUUID())
                 .targetId(UUID.randomUUID())
                 .type(ReminderThreadType.ITEM);
+    }
+
+    public ReminderThread toParent() {
+        ReminderThread thread = new ReminderThread();
+        thread.setParentId(getParentId());
+        thread.setTargetId(getTargetId());
+        thread.setType(getType());
+        return thread;
     }
 
 }

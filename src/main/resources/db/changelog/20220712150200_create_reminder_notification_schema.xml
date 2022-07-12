@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
+
+    <changeSet id="00000000000003" author="persoff68">
+
+        <createTable tableName="ftd_reminder_notification">
+            <column name="id" type="binary(16)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="reminder_id" type="binary(16)">
+                <constraints foreignKeyName="fk_reminder_notification_reminder"
+                             references="ftd_reminder(id)"
+                             deleteCascade="true" nullable="false"/>
+            </column>
+
+            <column name="date" type="timestamp(6)"/>
+
+            <column name="status" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="index_reminder_notification_reminder" tableName="ftd_reminder_notification">
+            <column name="reminder_id"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

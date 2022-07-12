@@ -20,31 +20,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     private final ItemServiceClient itemServiceClient;
 
     @Override
-    public boolean canReadItem(UUID itemId) {
+    public boolean hasItemsPermission(String permission, List<UUID> itemIdList) {
         try {
-            return itemServiceClient.canReadItem(itemId);
-        } catch (FeignException.NotFound e) {
-            throw new ModelNotFoundException();
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public boolean canEditItem(UUID itemId) {
-        try {
-            return itemServiceClient.canEditItem(itemId);
-        } catch (FeignException.NotFound e) {
-            throw new ModelNotFoundException();
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
-
-    @Override
-    public boolean canEditItems(List<UUID> itemIdList) {
-        try {
-            return itemServiceClient.canEditItems(itemIdList);
+            return itemServiceClient.hasItemsPermission(permission, itemIdList);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {

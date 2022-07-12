@@ -14,14 +14,8 @@ import java.util.UUID;
 @FeignClient(name = "item-service", primary = false, qualifiers = {"feignItemServiceClient"})
 public interface ItemServiceClient {
 
-    @GetMapping(value = "/api/permissions/item/read/{itemId}")
-    boolean canReadItem(@PathVariable UUID itemId);
-
-    @GetMapping(value = "/api/permissions/item/edit/{itemId}")
-    boolean canEditItem(@PathVariable UUID itemId);
-
-    @PostMapping(value = "/api/permissions/items/edit")
-    boolean canEditItems(@RequestBody List<UUID> itemIdList);
+    @PostMapping(value = "/api/permissions/items/{permission}")
+    boolean hasItemsPermission(@PathVariable String permission, @RequestBody List<UUID> itemIdList);
 
     @GetMapping(value = "/api/check/type-and-parent/{id}")
     TypeAndParent getTypeAndParent(@PathVariable UUID id);

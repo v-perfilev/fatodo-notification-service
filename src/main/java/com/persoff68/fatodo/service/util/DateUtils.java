@@ -2,7 +2,6 @@ package com.persoff68.fatodo.service.util;
 
 import com.persoff68.fatodo.model.DateParams;
 
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -13,7 +12,7 @@ public class DateUtils {
     private DateUtils() {
     }
 
-    public static Instant createInstant(DateParams dateParams) {
+    public static Date createDate(DateParams dateParams) {
         String timezone = dateParams.getTimezone();
         int date = dateParams.getDate();
         int month = dateParams.getMonth();
@@ -23,10 +22,10 @@ public class DateUtils {
         int minutes = getMinutes(time);
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes);
-        return calendar.toInstant();
+        return Date.from(calendar.toInstant());
     }
 
-    public static Instant createRelativeInstant(DateParams dateParams, int addDays) {
+    public static Date createRelativeDate(DateParams dateParams, int addDays) {
         String timezone = dateParams.getTimezone();
 
         Calendar today = createCalendar(timezone);
@@ -40,10 +39,10 @@ public class DateUtils {
 
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes);
-        return calendar.toInstant();
+        return Date.from(calendar.toInstant());
     }
 
-    public static Instant createYearlyInstant(DateParams dateParams) {
+    public static Date createYearlyDate(DateParams dateParams) {
         String timezone = dateParams.getTimezone();
 
         int date = dateParams.getDate();
@@ -58,7 +57,7 @@ public class DateUtils {
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes);
         addConditionalYearOffset(today, year, calendar);
-        return calendar.toInstant();
+        return Date.from(calendar.toInstant());
     }
 
     private static int getHours(int time) {

@@ -11,6 +11,7 @@ import com.persoff68.fatodo.service.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -29,25 +30,26 @@ public class NotificationService {
     private static final int WEEK_CALCULATION_PERIOD = 7;
     private static final int MONTH_CALCULATION_PERIOD = 31;
 
-    private final ClientService clientService;
+    private final MailService mailService;
     private final NotificationRepository notificationRepository;
 
+    @Transactional
     public void sendNotifications() {
         PageRequest request = PageRequest.of(0, TO_SEND_LIMIT);
         List<Notification> notificationList = notificationRepository.findAllToSend(new Date(), request);
         setNotificationsToPending(notificationList);
-        notificationList.parallelStream().forEach(clientService::sendNotification);
+        notificationList.parallelStream().forEach(mailService::sendNotification);
         setNotificationsToSent(notificationList);
     }
 
+    @Transactional
     public void deleteSentNotifications() {
         notificationRepository.deleteSent();
     }
 
-    public Instant generateNotifications(Reminder reminder) {
+    public List<Notification> generateNotifications(Reminder reminder) {
         Periodicity periodicity = reminder.getPeriodicity();
-        List<Notification> notificationList;
-        notificationList = switch (periodicity) {
+        return switch (periodicity) {
             case ONCE -> createOnceNotification(reminder);
             case DAILY -> createDailyNotifications(reminder);
             case WEEKLY -> createWeeklyNotifications(reminder);
@@ -55,28 +57,26 @@ public class NotificationService {
             case YEARLY -> createYearlyNotifications(reminder);
             default -> throw new ReminderException();
         };
-        notificationRepository.saveAll(notificationList);
-        return periodicity.equals(Periodicity.ONCE)
-                ? ZonedDateTime.now().plusYears(100).toInstant()
-                : maxNotificationDate(notificationList);
     }
 
-    public void deleteNotifications(Reminder reminder) {
-        List<Notification> notificationList = notificationRepository.findAllByReminderId(reminder.getId());
-        notificationRepository.deleteAll(notificationList);
+    public Date maxNotificationDate(List<Notification> notificationList) {
+        return notificationList.stream()
+                .map(Notification::getDate)
+                .max(Comparator.naturalOrder())
+                .orElse(createDatePlusWeek());
     }
 
     private List<Notification> createOnceNotification(Reminder reminder) {
         DateParams params = reminder.getDate();
-        Instant instant = DateUtils.createInstant(params);
-        Notification notification = new Notification(reminder, instant);
+        Date date = DateUtils.createDate(params);
+        Notification notification = new Notification(reminder, date);
         return Collections.singletonList(notification);
     }
 
     private List<Notification> createDailyNotifications(Reminder reminder) {
         DateParams params = reminder.getDate();
         return IntStream.rangeClosed(1, WEEK_CALCULATION_PERIOD)
-                .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
+                .mapToObj(i -> DateUtils.createRelativeDate(params, i))
                 .map(date -> new Notification(reminder, date))
                 .toList();
     }
@@ -85,7 +85,7 @@ public class NotificationService {
         DateParams params = reminder.getDate();
         List<Integer> weekDays = reminder.getWeekDays();
         return IntStream.rangeClosed(1, WEEK_CALCULATION_PERIOD)
-                .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
+                .mapToObj(i -> DateUtils.createRelativeDate(params, i))
                 .filter(weekDaysFilter(weekDays))
                 .map(instant -> new Notification(reminder, instant))
                 .toList();
@@ -95,7 +95,7 @@ public class NotificationService {
         DateParams params = reminder.getDate();
         List<Integer> monthDays = reminder.getMonthDays();
         return IntStream.rangeClosed(1, MONTH_CALCULATION_PERIOD)
-                .mapToObj(i -> DateUtils.createRelativeInstant(params, i))
+                .mapToObj(i -> DateUtils.createRelativeDate(params, i))
                 .filter(monthDaysFilter(monthDays))
                 .map(instant -> new Notification(reminder, instant))
                 .toList();
@@ -103,8 +103,8 @@ public class NotificationService {
 
     private List<Notification> createYearlyNotifications(Reminder reminder) {
         DateParams params = reminder.getDate();
-        Instant instant = DateUtils.createYearlyInstant(params);
-        Notification notification = new Notification(reminder, instant);
+        Date date = DateUtils.createYearlyDate(params);
+        Notification notification = new Notification(reminder, date);
         return Collections.singletonList(notification);
     }
 
@@ -118,29 +118,25 @@ public class NotificationService {
         notificationRepository.saveAll(notificationList);
     }
 
-    private Predicate<Instant> weekDaysFilter(List<Integer> weekDays) {
-        return instant -> {
+    private Predicate<Date> weekDaysFilter(List<Integer> weekDays) {
+        return date -> {
+            Instant instant = date.toInstant();
             int dayOfWeek = instant.atZone(ZoneId.systemDefault()).getDayOfWeek().getValue();
             return weekDays.contains(dayOfWeek);
         };
     }
 
-    private Predicate<Instant> monthDaysFilter(List<Integer> monthDays) {
-        return instant -> {
+    private Predicate<Date> monthDaysFilter(List<Integer> monthDays) {
+        return date -> {
+            Instant instant = date.toInstant();
             int dayOfMonth = instant.atZone(ZoneId.systemDefault()).getDayOfMonth();
             return monthDays.contains(dayOfMonth);
         };
     }
 
-    private Instant maxNotificationDate(List<Notification> notificationList) {
-        return notificationList.stream()
-                .map(Notification::getDate)
-                .max(Comparator.naturalOrder())
-                .orElse(createInstantPlusWeek());
-    }
-
-    private Instant createInstantPlusWeek() {
-        return ZonedDateTime.now().plusWeeks(1).toInstant();
+    private Date createDatePlusWeek() {
+        Instant instant = ZonedDateTime.now().plusWeeks(1).toInstant();
+        return Date.from(instant);
     }
 
 }

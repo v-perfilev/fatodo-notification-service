@@ -29,8 +29,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,10 +40,6 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = FatodoNotificationServiceApplication.class)
 class ReminderTaskIT {
-
-    private static final UUID TARGET_ID = UUID.randomUUID();
-    private static final UUID THREAD_ID = UUID.randomUUID();
-    private static final UUID REMINDER_ID = UUID.randomUUID();
 
     @Autowired
     ReminderTask reminderTask;
@@ -62,35 +58,33 @@ class ReminderTaskIT {
     @MockBean
     UserServiceClient userServiceClient;
 
+    ReminderThread thread;
+
     @BeforeEach
     void setup() {
-        ReminderThread thread = TestReminderThread.defaultBuilder().id(THREAD_ID).targetId(TARGET_ID).build();
-        threadRepository.save(thread);
+        thread = TestReminderThread.defaultBuilder().build().toParent();
+        thread = threadRepository.save(thread);
 
-        ReminderMessage message = TestReminderMessage.defaultBuilder().build();
+        ReminderMessage message = TestReminderMessage.defaultBuilder().build().toParent();
         when(itemServiceClient.getReminderByItemId(any())).thenReturn(message);
-        UserInfo userInfo = TestUserInfo.defaultBuilder().build();
+        UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
         doNothing().when(mailServiceClient).sendNotification(any());
     }
 
     @AfterEach
     void cleanup() {
-        notificationRepository.deleteAll();
-        reminderRepository.deleteAll();
         threadRepository.deleteAll();
     }
 
     @Test
     void testSendNotifications() {
-
-        Instant instant = Instant.now().minusSeconds(10);
-        Reminder reminder = TestReminder.defaultBuilder()
-                .id(REMINDER_ID).threadId(THREAD_ID).lastNotificationDate(instant).build();
-        reminderRepository.save(reminder);
-        Notification notification = TestNotification.defaultBuilder()
-                .reminderId(REMINDER_ID).date(instant).build();
-        notificationRepository.save(notification);
+        Date date = Date.from(Instant.now().minusSeconds(10));
+        Reminder reminder = TestReminder.defaultBuilder().thread(thread).lastNotificationDate(date).build().toParent();
+        Notification notification = TestNotification.defaultBuilder().reminder(reminder).date(date).build().toParent();
+        reminder.setNotifications(List.of(notification));
+        thread.setReminders(List.of(reminder));
+        threadRepository.save(thread);
 
         reminderTask.sendNotifications();
 
@@ -105,11 +99,11 @@ class ReminderTaskIT {
 
     @Test
     void testRecalculateExpiredReminders() {
-        Instant instant = Instant.now().minusSeconds(10);
-        Reminder reminder = TestReminder.defaultBuilder()
-                .id(REMINDER_ID).threadId(THREAD_ID)
-                .periodicity(Periodicity.DAILY).lastNotificationDate(instant).build();
-        reminderRepository.save(reminder);
+        Date date = Date.from(Instant.now().minusSeconds(10));
+        Reminder reminder = TestReminder.defaultBuilder().thread(thread)
+                .periodicity(Periodicity.DAILY).lastNotificationDate(date).build().toParent();
+        thread.setReminders(List.of(reminder));
+        threadRepository.save(thread);
 
         reminderTask.recalculateExpiredReminders();
 
@@ -119,14 +113,14 @@ class ReminderTaskIT {
 
     @Test
     void testDeleteSentNotifications() {
-        Instant instant = Instant.now().minusMillis(1000);
+        Date date = Date.from(Instant.now().minusMillis(1000));
         Reminder reminder = TestReminder.defaultBuilder()
-                .id(REMINDER_ID).threadId(THREAD_ID)
-                .periodicity(Periodicity.DAILY).lastNotificationDate(instant).build();
-        reminderRepository.save(reminder);
+                .thread(thread).periodicity(Periodicity.DAILY).lastNotificationDate(date).build().toParent();
         Notification notification = TestNotification.defaultBuilder()
-                .reminderId(REMINDER_ID).status(NotificationStatus.SENT).build();
-        notificationRepository.save(notification);
+                .reminder(reminder).status(NotificationStatus.SENT).build().toParent();
+        reminder.setNotifications(List.of(notification));
+        thread.setReminders(List.of(reminder));
+        threadRepository.save(thread);
 
         reminderTask.deleteSentNotifications();
 

@@ -14,11 +14,9 @@ import java.util.UUID;
 @Repository
 public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
 
-    List<Reminder> findAllByThreadId(UUID threadId);
-
     @Query("""
             select r from Reminder r
-            where r.lastNotificationDate < :date and r.locked = false
+            where r.lastNotificationDate < :date
             """)
     List<Reminder> findAllExpired(@Param("date") Date date, Pageable pageable);
 

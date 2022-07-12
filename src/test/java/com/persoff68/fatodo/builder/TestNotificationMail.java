@@ -31,4 +31,14 @@ public class TestNotificationMail extends NotificationMail {
                 .url(DEFAULT_VALUE);
     }
 
+    public NotificationMail toParent() {
+        NotificationMail mail = new NotificationMail();
+        mail.setLanguage(getLanguage());
+        mail.setEmail(getEmail());
+        mail.setUsername(getUsername());
+        mail.setMessage(getMessage());
+        mail.setUrl(getUrl());
+        return mail;
+    }
+
 }

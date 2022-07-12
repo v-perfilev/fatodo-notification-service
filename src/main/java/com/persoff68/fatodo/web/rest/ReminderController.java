@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(ReminderResource.ENDPOINT)
+@RequestMapping(ReminderController.ENDPOINT)
 @RequiredArgsConstructor
-public class ReminderResource {
+public class ReminderController {
     static final String ENDPOINT = "/api/reminders";
 
     private final ReminderService reminderService;

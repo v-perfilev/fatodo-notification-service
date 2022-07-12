@@ -21,7 +21,7 @@ class MailServiceCT {
 
     @Test
     void testSendNotification() {
-        NotificationMail dto = TestNotificationMail.defaultBuilder().build();
+        NotificationMail dto = TestNotificationMail.defaultBuilder().build().toParent();
         assertDoesNotThrow(() -> mailServiceClient.sendNotification(dto));
     }
 

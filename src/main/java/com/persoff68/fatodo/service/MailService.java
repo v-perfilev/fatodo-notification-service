@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ClientService {
+public class MailService {
 
     private final ItemServiceClient itemServiceClient;
     private final MailServiceClient mailServiceClient;

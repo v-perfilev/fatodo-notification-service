@@ -1,15 +1,15 @@
-package contracts.reminderresource
+package contracts.reminderthreadcontroller
 
 import org.springframework.cloud.contract.spec.Contract
 
 Contract.make {
-    name 'delete reminders by targetId'
+    name 'delete reminders by parentId'
     description 'should return status 200'
     request {
         method DELETE()
         url($(
-                consumer(regex("/api/reminders/" + uuid().toString())),
-                producer("/api/reminders/fc2c6859-dcdb-470d-9fc6-cf21a1bf98b0")
+                consumer(regex("/api/threads/" + uuid().toString() + "/parent")),
+                producer("/api/threads/df09ce60-c3cd-4355-b136-3ccc0698dbf5/parent")
         ))
         headers {
             header 'Authorization': $(

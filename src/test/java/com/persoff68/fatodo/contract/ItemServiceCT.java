@@ -25,21 +25,9 @@ class ItemServiceCT {
     ItemServiceClient itemServiceClient;
 
     @Test
-    void testCanReadItem() {
-        boolean canRead = itemServiceClient.canReadItem(UUID.randomUUID());
-        assertThat(canRead).isTrue();
-    }
-
-    @Test
-    void testCanEditItem() {
-        boolean canEdit = itemServiceClient.canEditItem(UUID.randomUUID());
-        assertThat(canEdit).isTrue();
-    }
-
-    @Test
-    void testCanEditItems() {
-        List<UUID> itemIdList = Collections.singletonList(UUID.randomUUID());
-        boolean canRead = itemServiceClient.canEditItems(itemIdList);
+    void testHasItemsPermission() {
+        List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
+        boolean canRead = itemServiceClient.hasItemsPermission("READ", targetIdList);
         assertThat(canRead).isTrue();
     }
 

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -21,63 +22,39 @@ public class PermissionService {
 
     private final ItemServiceClient itemServiceClient;
 
-    public void checkThreadReadPermission(ReminderThread thread) {
-        ReminderThreadType type = thread.getType();
-        if (type == ReminderThreadType.ITEM) {
-            checkItemReadPermission(thread);
-        } else {
-            throw new PermissionException();
-        }
-    }
-
-    public void checkThreadEditPermission(ReminderThread thread) {
-        ReminderThreadType type = thread.getType();
-        if (type == ReminderThreadType.ITEM) {
-            checkItemEditPermission(thread);
-        } else {
-            throw new PermissionException();
-        }
-    }
-
-    public void checkThreadsEditPermission(Collection<ReminderThread> threadCollection) {
+    public void checkThreadsPermission(String permission, Collection<ReminderThread> threadCollection) {
         Multimap<ReminderThreadType, ReminderThread> threadMultimap = threadCollection.stream()
                 .collect(Multimaps.toMultimap(
                         ReminderThread::getType,
                         Function.identity(),
                         HashMultimap::create
                 ));
-        threadMultimap.keySet().forEach(key -> checkSameTypeThreadsEditPermission(key, threadMultimap.get(key)));
+        threadMultimap.keySet().forEach(key -> checkSameTypeThreadsPermission(key, permission,
+                threadMultimap.get(key)));
     }
 
-    private void checkSameTypeThreadsEditPermission(ReminderThreadType type,
-                                                    Collection<ReminderThread> threadCollection) {
+    public void checkThreadPermission(String permission, ReminderThread thread) {
+        ReminderThreadType type = thread.getType();
+        UUID targetId = thread.getTargetId();
+        List<UUID> targetIdList = Collections.singletonList(targetId);
         switch (type) {
-            case ITEM -> checkItemsEditPermission(threadCollection);
+            case ITEM -> checkItemsPermission(permission, targetIdList);
             default -> throw new PermissionException();
         }
     }
 
-    private void checkItemReadPermission(ReminderThread thread) {
-        UUID targetId = thread.getTargetId();
-        boolean hasPermission = itemServiceClient.canReadItem(targetId);
-        if (!hasPermission) {
-            throw new PermissionException();
+    private void checkSameTypeThreadsPermission(ReminderThreadType type,
+                                                String permission,
+                                                Collection<ReminderThread> threadCollection) {
+        List<UUID> targetIdList = threadCollection.stream().map(ReminderThread::getTargetId).toList();
+        switch (type) {
+            case ITEM -> checkItemsPermission(permission, targetIdList);
+            default -> throw new PermissionException();
         }
     }
 
-    private void checkItemEditPermission(ReminderThread thread) {
-        UUID targetId = thread.getTargetId();
-        boolean hasPermission = itemServiceClient.canEditItem(targetId);
-        if (!hasPermission) {
-            throw new PermissionException();
-        }
-    }
-
-    private void checkItemsEditPermission(Collection<ReminderThread> threadCollection) {
-        List<UUID> itemIdList = threadCollection.stream()
-                .map(ReminderThread::getTargetId)
-                .toList();
-        boolean hasPermission = itemServiceClient.canEditItems(itemIdList);
+    private void checkItemsPermission(String permission, List<UUID> itemIdList) {
+        boolean hasPermission = itemServiceClient.hasItemsPermission(permission, itemIdList);
         if (!hasPermission) {
             throw new PermissionException();
         }

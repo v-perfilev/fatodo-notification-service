@@ -39,7 +39,8 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.Instant;
 import java.util.Collections;
-import java.util.UUID;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -58,10 +59,6 @@ import static org.mockito.Mockito.when;
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 public class MailProducerIT {
-
-    private static final UUID TARGET_ID = UUID.randomUUID();
-    private static final UUID THREAD_ID = UUID.randomUUID();
-    private static final UUID REMINDER_ID = UUID.randomUUID();
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
@@ -89,15 +86,16 @@ public class MailProducerIT {
     private ConcurrentMessageListenerContainer<String, NotificationMail> notificationContainer;
     private BlockingQueue<ConsumerRecord<String, NotificationMail>> notificationRecords;
 
+    ReminderThread thread;
 
     @BeforeEach
     void setup() {
-        ReminderThread thread = TestReminderThread.defaultBuilder().id(THREAD_ID).targetId(TARGET_ID).build();
+        thread = TestReminderThread.defaultBuilder().build().toParent();
         threadRepository.save(thread);
 
-        ReminderMessage message = TestReminderMessage.defaultBuilder().build();
+        ReminderMessage message = TestReminderMessage.defaultBuilder().build().toParent();
         when(itemServiceClient.getReminderByItemId(any())).thenReturn(message);
-        UserInfo userInfo = TestUserInfo.defaultBuilder().build();
+        UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
 
         startNotificationConsumer();
@@ -114,12 +112,12 @@ public class MailProducerIT {
 
     @Test
     void testSendNotifications() throws InterruptedException {
-        Instant instant = Instant.now().minusSeconds(10);
-        Reminder reminder =
-                TestReminder.defaultBuilder().id(REMINDER_ID).threadId(THREAD_ID).lastNotificationDate(instant).build();
-        reminderRepository.save(reminder);
-        Notification notification = TestNotification.defaultBuilder().reminderId(REMINDER_ID).date(instant).build();
-        notificationRepository.save(notification);
+        Date date = Date.from(Instant.now().minusSeconds(10));
+        Reminder reminder = TestReminder.defaultBuilder().thread(thread).lastNotificationDate(date).build().toParent();
+        Notification notification = TestNotification.defaultBuilder().reminder(reminder).date(date).build().toParent();
+        reminder.setNotifications(List.of(notification));
+        thread.setReminders(List.of(reminder));
+        threadRepository.save(thread);
 
         reminderTask.sendNotifications();
         ConsumerRecord<String, NotificationMail> record = notificationRecords.poll(10, TimeUnit.SECONDS);

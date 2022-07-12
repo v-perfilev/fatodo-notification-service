@@ -26,4 +26,12 @@ public class TestReminderMessage extends ReminderMessage {
                 .userIds(Collections.singletonList(UUID.randomUUID()));
     }
 
+    public ReminderMessage toParent() {
+        ReminderMessage message = new ReminderMessage();
+        message.setMessage(getMessage());
+        message.setUrl(getUrl());
+        message.setUserIds(getUserIds());
+        return message;
+    }
+
 }

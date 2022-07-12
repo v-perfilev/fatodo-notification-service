@@ -25,10 +25,20 @@ public class TestReminderDTO extends ReminderDTO {
     }
 
     public static TestReminderDTOBuilder defaultBuilder() {
-        DateParams date = TestDateParams.defaultBuilder().build();
+        DateParams date = TestDateParams.defaultBuilder().build().toParent();
         return TestReminderDTO.builder()
                 .periodicity(Periodicity.ONCE)
                 .date(date);
+    }
+
+    public ReminderDTO toParent() {
+        ReminderDTO dto = new ReminderDTO();
+        dto.setId(getId());
+        dto.setPeriodicity(getPeriodicity());
+        dto.setDate(getDate());
+        dto.setWeekDays(getWeekDays());
+        dto.setMonthDays(getMonthDays());
+        return dto;
     }
 
 }

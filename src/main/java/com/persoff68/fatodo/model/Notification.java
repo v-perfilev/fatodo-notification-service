@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Table(name = "ftd_reminder_notification")
@@ -28,12 +28,12 @@ public class Notification extends AbstractModel {
     private Reminder reminder;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Instant date;
+    private Date date;
 
     @NotNull
     private NotificationStatus status = NotificationStatus.CREATED;
 
-    public Notification(Reminder reminder, Instant date) {
+    public Notification(Reminder reminder, Date date) {
         this.reminder = reminder;
         this.date = date;
     }

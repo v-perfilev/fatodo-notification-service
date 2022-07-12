@@ -8,6 +8,7 @@ import com.persoff68.fatodo.repository.ReminderThreadRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,18 +22,19 @@ public class ReminderThreadService {
     private final PermissionService permissionService;
     private final ItemServiceClient itemServiceClient;
 
+    @Transactional
     public ReminderThread getByTargetIdOrCreate(UUID targetId) {
         try {
             ReminderThread thread = threadRepository.findByTargetId(targetId)
                     .orElseThrow(ModelNotFoundException::new);
-            permissionService.checkThreadEditPermission(thread);
+            permissionService.checkThreadPermission("EDIT", thread);
             return thread;
         } catch (ModelNotFoundException e) {
             TypeAndParent typeAndParent = getTypeByTargetId(targetId);
             UUID parentId = typeAndParent.getParentId();
             ReminderThreadType type = typeAndParent.getType();
             ReminderThread thread = ReminderThread.of(parentId, targetId, type);
-            permissionService.checkThreadEditPermission(thread);
+            permissionService.checkThreadPermission("EDIT", thread);
             return threadRepository.save(thread);
         }
     }
@@ -40,14 +42,14 @@ public class ReminderThreadService {
     public ReminderThread getByTargetId(UUID targetId) {
         ReminderThread thread = threadRepository.findByTargetId(targetId)
                 .orElseThrow(ModelNotFoundException::new);
-        permissionService.checkThreadReadPermission(thread);
+        permissionService.checkThreadPermission("READ", thread);
         return thread;
     }
 
     public void deleteByParentId(UUID parentId) {
         List<ReminderThread> threadList = threadRepository.findAllByParentId(parentId);
         if (!threadList.isEmpty()) {
-            permissionService.checkThreadsEditPermission(threadList);
+            permissionService.checkThreadsPermission("EDIT", threadList);
             threadRepository.deleteAll(threadList);
         }
     }
@@ -56,7 +58,7 @@ public class ReminderThreadService {
         Optional<ReminderThread> threadOptional = threadRepository.findByTargetId(targetId);
         if (threadOptional.isPresent()) {
             ReminderThread thread = threadOptional.get();
-            permissionService.checkThreadEditPermission(thread);
+            permissionService.checkThreadPermission("EDIT", thread);
             threadRepository.delete(thread);
         }
     }
