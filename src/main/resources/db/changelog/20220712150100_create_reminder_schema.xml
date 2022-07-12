@@ -28,7 +28,7 @@
             <column name="last_notification_date" type="timestamp(6)"/>
         </createTable>
 
-        <createIndex indexName="index_reminder" tableName="ftd_reminder">
+        <createIndex indexName="index_reminder_thread" tableName="ftd_reminder">
             <column name="thread_id"/>
         </createIndex>
 
