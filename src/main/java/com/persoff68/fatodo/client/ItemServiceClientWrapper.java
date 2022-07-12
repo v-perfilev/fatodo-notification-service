@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
-import com.persoff68.fatodo.model.ReminderMessage;
+import com.persoff68.fatodo.model.ReminderMailInfo;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import feign.FeignException;
@@ -64,9 +64,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public ReminderMessage getReminderByItemId(UUID itemId) {
+    public ReminderMailInfo getReminderMailInfo(UUID itemId) {
         try {
-            return itemServiceClient.getReminderByItemId(itemId);
+            return itemServiceClient.getReminderMailInfo(itemId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {

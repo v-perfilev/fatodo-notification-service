@@ -5,7 +5,7 @@ import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.NotificationMail;
-import com.persoff68.fatodo.model.ReminderMessage;
+import com.persoff68.fatodo.model.ReminderMailInfo;
 import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.UserInfo;
 import com.persoff68.fatodo.model.constant.ReminderThreadType;
@@ -27,12 +27,12 @@ public class MailService {
     @Transactional
     public void sendNotification(Notification notification) {
         ReminderThread thread = notification.getReminder().getThread();
-        ReminderMessage message = getReminderMessageByThread(thread);
+        ReminderMailInfo message = getReminderMessageByThread(thread);
         List<UserInfo> userList = getUserListByIds(message.getUserIds());
         sendMailNotifications(message, userList);
     }
 
-    private void sendMailNotifications(ReminderMessage message, List<UserInfo> userList) {
+    private void sendMailNotifications(ReminderMailInfo message, List<UserInfo> userList) {
         userList.stream()
                 .map(u -> new NotificationMail(u, message))
                 .forEach(mailServiceClient::sendNotification);
@@ -42,11 +42,11 @@ public class MailService {
         return userServiceClient.getAllInfoByIds(userIdList);
     }
 
-    private ReminderMessage getReminderMessageByThread(ReminderThread thread) {
+    private ReminderMailInfo getReminderMessageByThread(ReminderThread thread) {
         UUID targetId = thread.getTargetId();
         ReminderThreadType type = thread.getType();
         return switch (type) {
-            case ITEM -> itemServiceClient.getReminderByItemId(targetId);
+            case ITEM -> itemServiceClient.getReminderMailInfo(targetId);
         };
     }
 

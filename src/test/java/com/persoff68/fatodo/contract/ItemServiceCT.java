@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.contract;
 
 import com.persoff68.fatodo.client.ItemServiceClient;
-import com.persoff68.fatodo.model.ReminderMessage;
+import com.persoff68.fatodo.model.ReminderMailInfo;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.ReminderThreadType;
 import org.junit.jupiter.api.Test;
@@ -51,8 +51,8 @@ class ItemServiceCT {
     }
 
     @Test
-    void testGetReminderByItemId() {
-        ReminderMessage message = itemServiceClient.getReminderByItemId(UUID.randomUUID());
+    void testGetReminderMailInfo() {
+        ReminderMailInfo message = itemServiceClient.getReminderMailInfo(UUID.randomUUID());
         assertThat(message).isNotNull();
     }
 

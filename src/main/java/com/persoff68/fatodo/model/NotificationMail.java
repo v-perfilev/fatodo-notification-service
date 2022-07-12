@@ -19,7 +19,7 @@ public class NotificationMail implements Serializable {
     private String message;
     private String url;
 
-    public NotificationMail(UserInfo user, ReminderMessage message) {
+    public NotificationMail(UserInfo user, ReminderMailInfo message) {
         this.language = user.getLanguage();
         this.email = user.getEmail();
         this.username = user.getUsername();
