@@ -42,12 +42,14 @@ public abstract class ContractBase {
 
         UUID threadId = UUID.fromString(PARENT_ID);
         UUID targetId = UUID.fromString(TARGET_ID);
-        ReminderThread thread = TestReminderThread.defaultBuilder().parentId(threadId).targetId(targetId).build().toParent();
+        ReminderThread thread = TestReminderThread.defaultBuilder()
+                .parentId(threadId).targetId(targetId).build().toParent();
         Reminder reminder = TestReminder.defaultBuilder().thread(thread).build().toParent();
         thread.setReminders(List.of(reminder));
         threadRepository.save(thread);
 
         when(itemServiceClient.hasItemsPermission(any(), any())).thenReturn(true);
+        when(itemServiceClient.getGroupIdsForUser()).thenReturn(List.of(UUID.fromString(PARENT_ID)));
     }
 
 }

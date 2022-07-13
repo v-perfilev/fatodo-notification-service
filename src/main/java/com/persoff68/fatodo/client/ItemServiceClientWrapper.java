@@ -20,6 +20,15 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     private final ItemServiceClient itemServiceClient;
 
     @Override
+    public List<UUID> getGroupIdsForUser() {
+        try {
+            return itemServiceClient.getGroupIdsForUser();
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
+
+    @Override
     public boolean hasItemsPermission(String permission, List<UUID> itemIdList) {
         try {
             return itemServiceClient.hasItemsPermission(permission, itemIdList);

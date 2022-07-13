@@ -20,4 +20,11 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
             """)
     List<Reminder> findAllExpired(@Param("date") Date date, Pageable pageable);
 
+    @Query("""
+            select r from Reminder r
+            where r.thread.parentId in :parentIds and r.createdAt < :endMonthDate
+            """)
+    List<Reminder> findAllByParentIds(@Param("parentIds") List<UUID> parentIds,
+                                      @Param("endMonthDate") Date endMonthDate);
+
 }

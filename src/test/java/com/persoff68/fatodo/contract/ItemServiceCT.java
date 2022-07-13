@@ -25,6 +25,12 @@ class ItemServiceCT {
     ItemServiceClient itemServiceClient;
 
     @Test
+    void testGetGroupIdsForUser() {
+        List<UUID> groupIdList = itemServiceClient.getGroupIdsForUser();
+        assertThat(groupIdList).isNotEmpty();
+    }
+
+    @Test
     void testHasItemsPermission() {
         List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
         boolean canRead = itemServiceClient.hasItemsPermission("READ", targetIdList);

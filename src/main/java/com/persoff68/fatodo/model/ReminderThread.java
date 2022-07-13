@@ -35,7 +35,7 @@ public class ReminderThread extends AbstractModel {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    ReminderThreadType type;
+    private ReminderThreadType type;
 
     @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reminder> reminders = new ArrayList<>();

@@ -26,6 +26,11 @@
             <column name="month_days" type="varchar(128)"/>
 
             <column name="last_notification_date" type="timestamp(6)"/>
+
+            <column name="created_by" type="binary(16)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="last_modified_by" type="binary(16)"/>
+            <column name="last_modified_at" type="timestamp"/>
         </createTable>
 
         <createIndex indexName="index_reminder_thread" tableName="ftd_reminder">

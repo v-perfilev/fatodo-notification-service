@@ -28,16 +28,19 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(exclude = {"thread", "notifications"})
-public class Reminder extends AbstractModel {
+public class Reminder extends AbstractAuditingModel {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     private ReminderThread thread;
 
     private Periodicity periodicity;
+
     @Convert(converter = DataParamsConverter.class)
     private DateParams date;
+
     @Convert(converter = ArrayListConverter.class)
     private List<Integer> weekDays;
+
     @Convert(converter = ArrayListConverter.class)
     private List<Integer> monthDays;
 
@@ -50,15 +53,19 @@ public class Reminder extends AbstractModel {
     public boolean isSameReminder(Reminder reminder) {
         return objectsEqual(this.periodicity, reminder.getPeriodicity())
                 && objectsEqual(this.date, reminder.getDate())
-                && listsEqual(this.weekDays, reminder.getWeekDays())
-                && listsEqual(this.monthDays, reminder.getMonthDays());
+                && integerListsEqual(this.weekDays, reminder.getWeekDays())
+                && integerListsEqual(this.monthDays, reminder.getMonthDays());
+    }
+
+    public static boolean listContains(List<Reminder> list, Reminder item) {
+        return list.stream().anyMatch(l -> l.isSameReminder(item));
     }
 
     private static <T> boolean objectsEqual(T o1, T o2) {
         return o1.equals(o2);
     }
 
-    private static boolean listsEqual(List<Integer> list1, List<Integer> list2) {
+    private static boolean integerListsEqual(List<Integer> list1, List<Integer> list2) {
         List<Integer> sortedList1 = list1.stream().sorted().toList();
         List<Integer> sortedList2 = list2.stream().sorted().toList();
         return sortedList1.equals(sortedList2);

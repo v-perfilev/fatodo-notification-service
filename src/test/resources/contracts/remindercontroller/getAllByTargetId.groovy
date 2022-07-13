@@ -1,4 +1,4 @@
-package contracts.reminderresource
+package contracts.remindercontroller
 
 import org.springframework.cloud.contract.spec.Contract
 

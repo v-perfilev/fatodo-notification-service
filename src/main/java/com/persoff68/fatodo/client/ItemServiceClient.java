@@ -14,6 +14,9 @@ import java.util.UUID;
 @FeignClient(name = "item-service", primary = false, qualifiers = {"feignItemServiceClient"})
 public interface ItemServiceClient {
 
+    @GetMapping(value = "/api/permissions/groups")
+    List<UUID> getGroupIdsForUser();
+
     @PostMapping(value = "/api/permissions/items/{permission}")
     boolean hasItemsPermission(@PathVariable String permission, @RequestBody List<UUID> itemIdList);
 

@@ -22,6 +22,10 @@ public class PermissionService {
 
     private final ItemServiceClient itemServiceClient;
 
+    public List<UUID> getParentIds() {
+        return itemServiceClient.getGroupIdsForUser();
+    }
+
     public void checkThreadsPermission(String permission, Collection<ReminderThread> threadCollection) {
         Multimap<ReminderThreadType, ReminderThread> threadMultimap = threadCollection.stream()
                 .collect(Multimaps.toMultimap(
