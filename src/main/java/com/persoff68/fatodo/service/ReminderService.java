@@ -90,10 +90,11 @@ public class ReminderService {
     }
 
     private void setReminderNotifications(Reminder reminder) {
-        List<Notification> notificationList = notificationService.generateNotifications(reminder, Optional.empty());
-        Date lastNotificationDate = reminder.getPeriodicity().equals(Periodicity.ONCE) ?
-                Date.from(ZonedDateTime.now().plusYears(100).toInstant()) :
-                notificationService.maxNotificationDate(notificationList);
+        List<Notification> notificationList = notificationService
+                .generateNotifications(reminder, Optional.empty());
+        Date lastNotificationDate = reminder.getPeriodicity().equals(Periodicity.ONCE)
+                ? Date.from(ZonedDateTime.now().plusYears(100).toInstant())
+                : notificationService.maxNotificationDate(notificationList);
         reminder.getNotifications().addAll(notificationList);
         reminder.setLastNotificationDate(lastNotificationDate);
     }
