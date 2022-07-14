@@ -6,6 +6,7 @@ import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.constant.NotificationStatus;
 import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.NotificationRepository;
+import com.persoff68.fatodo.service.client.MailService;
 import com.persoff68.fatodo.service.exception.ReminderException;
 import com.persoff68.fatodo.service.util.DateUtils;
 import lombok.RequiredArgsConstructor;

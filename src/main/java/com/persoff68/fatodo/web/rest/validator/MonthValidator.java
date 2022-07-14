@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.web.rest.validator;
 
 import com.persoff68.fatodo.web.rest.validator.util.DateUtils;
-import com.persoff68.fatodo.web.rest.vm.MonthVM;
+import com.persoff68.fatodo.model.vm.MonthVM;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

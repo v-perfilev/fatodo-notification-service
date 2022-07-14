@@ -7,6 +7,7 @@ import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
+import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
@@ -30,8 +31,8 @@ public class ReminderService {
 
     private final ReminderThreadService threadService;
     private final PermissionService permissionService;
-    private final ReminderThreadRepository threadRepository;
     private final NotificationService notificationService;
+    private final ReminderThreadRepository threadRepository;
     private final ReminderRepository reminderRepository;
 
     @Transactional

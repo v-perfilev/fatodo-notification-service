@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.service;
+package com.persoff68.fatodo.service.client;
 
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;

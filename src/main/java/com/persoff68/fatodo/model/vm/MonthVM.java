@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.web.rest.vm;
+package com.persoff68.fatodo.model.vm;
 
 import com.persoff68.fatodo.web.rest.validator.MonthConstraint;
 import lombok.AllArgsConstructor;

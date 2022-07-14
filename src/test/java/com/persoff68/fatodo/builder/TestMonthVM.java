@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.builder;
 
-import com.persoff68.fatodo.web.rest.vm.MonthVM;
+import com.persoff68.fatodo.model.vm.MonthVM;
 import lombok.Builder;
 
 public class TestMonthVM extends MonthVM {

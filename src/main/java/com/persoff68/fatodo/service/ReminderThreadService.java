@@ -5,6 +5,7 @@ import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.ReminderThreadType;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
+import com.persoff68.fatodo.service.client.PermissionService;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
