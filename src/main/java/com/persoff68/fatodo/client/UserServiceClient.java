@@ -11,7 +11,7 @@ import java.util.UUID;
 @FeignClient(name = "user-service", primary = false, qualifiers = {"feignUserServiceClient"})
 public interface UserServiceClient {
 
-    @PostMapping(value = "/api/user-data/info/ids")
+    @PostMapping(value = "/api/info/info")
     List<UserInfo> getAllInfoByIds(@RequestBody List<UUID> userIdList);
 
 }
