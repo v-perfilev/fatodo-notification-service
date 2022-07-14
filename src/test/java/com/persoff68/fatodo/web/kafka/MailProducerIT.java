@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
 })
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
-public class MailProducerIT {
+class MailProducerIT {
 
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
@@ -122,7 +122,7 @@ public class MailProducerIT {
         reminderTask.sendNotifications();
         ConsumerRecord<String, NotificationMail> record = notificationRecords.poll(10, TimeUnit.SECONDS);
 
-        assertThat(mailServiceClient instanceof MailProducer).isTrue();
+        assertThat(mailServiceClient).isInstanceOf(MailProducer.class);
         assertThat(record).isNotNull();
         verify(mailServiceClient).sendNotification(any());
     }
