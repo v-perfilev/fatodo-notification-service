@@ -9,7 +9,11 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 public class ReminderMailInfo {
+
     private String message;
+
     private String url;
+
     private List<UUID> userIds;
+
 }

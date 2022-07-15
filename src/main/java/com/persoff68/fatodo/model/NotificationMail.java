@@ -1,24 +1,22 @@
 package com.persoff68.fatodo.model;
 
-import com.persoff68.fatodo.config.constant.AppConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NotificationMail implements Serializable {
-    @Serial
-    private static final long serialVersionUID = AppConstants.SERIAL_VERSION_UID;
+public class NotificationMail {
 
     private String language;
+
     private String email;
+
     private String username;
+
     private String message;
+
     private String url;
 
     public NotificationMail(UserInfo user, ReminderMailInfo message) {
