@@ -6,6 +6,7 @@ import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderMailInfo;
 import com.persoff68.fatodo.builder.TestReminderThread;
 import com.persoff68.fatodo.builder.TestUserInfo;
+import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
@@ -57,6 +58,8 @@ class ReminderTaskIT {
     MailServiceClient mailServiceClient;
     @MockBean
     UserServiceClient userServiceClient;
+    @MockBean
+    EventServiceClient eventServiceClient;
 
     ReminderThread thread;
 
@@ -70,6 +73,7 @@ class ReminderTaskIT {
         UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
         doNothing().when(mailServiceClient).sendNotification(any());
+        doNothing().when(eventServiceClient).addReminderEvent(any());
     }
 
     @AfterEach

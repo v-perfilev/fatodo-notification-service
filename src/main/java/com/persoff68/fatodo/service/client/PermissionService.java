@@ -22,6 +22,15 @@ public class PermissionService {
 
     private final ItemServiceClient itemServiceClient;
 
+    public List<UUID> getThreadUserIds(ReminderThread thread) {
+        ReminderThreadType type = thread.getType();
+        if (type.equals(ReminderThreadType.ITEM)) {
+            return itemServiceClient.getUserIdsByItemId(thread.getTargetId());
+        } else {
+            return itemServiceClient.getUserIdsByGroupId(thread.getTargetId());
+        }
+    }
+
     public List<UUID> getParentIds() {
         return itemServiceClient.getGroupIdsForUser();
     }

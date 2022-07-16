@@ -6,6 +6,7 @@ import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.constant.NotificationStatus;
 import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.NotificationRepository;
+import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.MailService;
 import com.persoff68.fatodo.service.exception.ReminderException;
 import com.persoff68.fatodo.service.util.DateUtils;
@@ -33,15 +34,20 @@ public class NotificationService {
     private static final int WEEK_CALCULATION_PERIOD = 7;
     private static final int MONTH_CALCULATION_PERIOD = 31;
 
-    private final MailService mailService;
     private final NotificationRepository notificationRepository;
+    private final EventService eventService;
+    private final MailService mailService;
 
     @Transactional
     public void sendNotifications() {
         PageRequest request = PageRequest.of(0, TO_SEND_LIMIT);
         List<Notification> notificationList = notificationRepository.findAllToSend(new Date(), request);
         setNotificationsToPending(notificationList);
-        notificationList.parallelStream().forEach(mailService::sendNotification);
+        notificationList.parallelStream().forEach(notification -> {
+            Reminder reminder = notification.getReminder();
+            eventService.sendReminderEvent(reminder);
+            mailService.sendNotification(notification);
+        });
         setNotificationsToSent(notificationList);
     }
 
