@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.contract;
 
+import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.client.ItemServiceClient;
 import com.persoff68.fatodo.model.ReminderMailInfo;
 import com.persoff68.fatodo.model.TypeAndParent;
@@ -25,12 +26,14 @@ class ItemServiceCT {
     ItemServiceClient itemServiceClient;
 
     @Test
+    @WithCustomSecurityContext
     void testGetGroupIdsForUser() {
         List<UUID> groupIdList = itemServiceClient.getGroupIdsForUser();
         assertThat(groupIdList).isNotEmpty();
     }
 
     @Test
+    @WithCustomSecurityContext
     void testHasItemsPermission() {
         List<UUID> targetIdList = Collections.singletonList(UUID.randomUUID());
         boolean canRead = itemServiceClient.hasItemsPermission("READ", targetIdList);
@@ -38,6 +41,7 @@ class ItemServiceCT {
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetTypeAndParent() {
         TypeAndParent typeAndParent = itemServiceClient.getTypeAndParent(UUID.randomUUID());
         assertThat(typeAndParent.getType()).isEqualTo(ReminderThreadType.ITEM);
@@ -45,18 +49,21 @@ class ItemServiceCT {
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetUserIdsByGroupId() {
         List<UUID> userIdList = itemServiceClient.getUserIdsByGroupId(UUID.randomUUID());
         assertThat(userIdList).isNotEmpty();
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetUserIdsByItemId() {
         List<UUID> userIdList = itemServiceClient.getUserIdsByItemId(UUID.randomUUID());
         assertThat(userIdList).isNotEmpty();
     }
 
     @Test
+    @WithCustomSecurityContext
     void testGetReminderMailInfo() {
         ReminderMailInfo message = itemServiceClient.getReminderMailInfo(UUID.randomUUID());
         assertThat(message).isNotNull();
