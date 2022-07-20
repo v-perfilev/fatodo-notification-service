@@ -7,7 +7,7 @@ import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderMailInfo;
 import com.persoff68.fatodo.builder.TestReminderThread;
 import com.persoff68.fatodo.builder.TestUserInfo;
-import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
@@ -76,7 +76,7 @@ class MailProducerIT {
     ObjectMapper objectMapper;
 
     @MockBean
-    ItemServiceClient itemServiceClient;
+    ItemSystemServiceClient itemSystemServiceClient;
     @MockBean
     UserServiceClient userServiceClient;
 
@@ -94,7 +94,7 @@ class MailProducerIT {
         threadRepository.save(thread);
 
         ReminderMailInfo message = TestReminderMailInfo.defaultBuilder().build().toParent();
-        when(itemServiceClient.getReminderMailInfo(any())).thenReturn(message);
+        when(itemSystemServiceClient.getReminderMailInfo(any())).thenReturn(message);
         UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
 

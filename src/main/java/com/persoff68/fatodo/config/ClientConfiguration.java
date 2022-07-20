@@ -2,6 +2,7 @@ package com.persoff68.fatodo.config;
 
 import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +19,23 @@ public class ClientConfiguration {
 
     @Bean
     @Primary
+    public EventServiceClient eventClient() {
+        boolean kafkaProducerExists = beanFactory.containsBean("eventProducer");
+        return kafkaProducerExists
+                ? (EventServiceClient) beanFactory.getBean("eventProducer")
+                : (EventServiceClient) beanFactory.getBean("eventServiceClientWrapper");
+    }
+
+    @Bean
+    @Primary
     public ItemServiceClient itemClient() {
         return (ItemServiceClient) beanFactory.getBean("itemServiceClientWrapper");
     }
 
     @Bean
     @Primary
-    public EventServiceClient eventClient() {
-        boolean kafkaProducerExists = beanFactory.containsBean("eventProducer");
-        return kafkaProducerExists
-                ? (EventServiceClient) beanFactory.getBean("eventProducer")
-                : (EventServiceClient) beanFactory.getBean("eventServiceClientWrapper");
+    public ItemSystemServiceClient itemSystemClient() {
+        return (ItemSystemServiceClient) beanFactory.getBean("itemSystemServiceClientWrapper");
     }
 
     @Bean

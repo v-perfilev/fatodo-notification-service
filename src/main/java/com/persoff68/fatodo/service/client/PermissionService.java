@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.constant.ReminderThreadType;
 import com.persoff68.fatodo.service.exception.PermissionException;
@@ -21,13 +22,14 @@ import java.util.function.Function;
 public class PermissionService {
 
     private final ItemServiceClient itemServiceClient;
+    private final ItemSystemServiceClient itemSystemServiceClient;
 
     public List<UUID> getThreadUserIds(ReminderThread thread) {
         ReminderThreadType type = thread.getType();
         if (type.equals(ReminderThreadType.ITEM)) {
-            return itemServiceClient.getUserIdsByItemId(thread.getTargetId());
+            return itemSystemServiceClient.getUserIdsByItemId(thread.getTargetId());
         } else {
-            return itemServiceClient.getUserIdsByGroupId(thread.getTargetId());
+            return itemSystemServiceClient.getUserIdsByGroupId(thread.getTargetId());
         }
     }
 

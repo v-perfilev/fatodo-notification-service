@@ -5,7 +5,7 @@ import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderThread;
 import com.persoff68.fatodo.client.EventServiceClient;
-import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
@@ -69,7 +69,7 @@ class EventProducerIT {
     NotificationRepository notificationRepository;
 
     @MockBean
-    ItemServiceClient itemServiceClient;
+    ItemSystemServiceClient itemSystemServiceClient;
     @MockBean
     MailService mailService;
     @SpyBean

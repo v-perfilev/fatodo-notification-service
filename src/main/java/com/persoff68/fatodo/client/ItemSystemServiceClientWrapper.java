@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
-import com.persoff68.fatodo.model.TypeAndParent;
+import com.persoff68.fatodo.model.ReminderMailInfo;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -13,24 +13,15 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class ItemServiceClientWrapper implements ItemServiceClient {
+public class ItemSystemServiceClientWrapper implements ItemSystemServiceClient {
 
-    @Qualifier("feignItemServiceClient")
-    private final ItemServiceClient itemServiceClient;
-
-    @Override
-    public List<UUID> getGroupIdsForUser() {
-        try {
-            return itemServiceClient.getGroupIdsForUser();
-        } catch (Exception e) {
-            throw new ClientException();
-        }
-    }
+    @Qualifier("feignItemSystemServiceClient")
+    private final ItemSystemServiceClient itemSystemServiceClient;
 
     @Override
-    public boolean hasItemsPermission(String permission, List<UUID> itemIdList) {
+    public List<UUID> getUserIdsByGroupId(UUID groupId) {
         try {
-            return itemServiceClient.hasItemsPermission(permission, itemIdList);
+            return itemSystemServiceClient.getUserIdsByGroupId(groupId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {
@@ -39,9 +30,9 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
     }
 
     @Override
-    public TypeAndParent getTypeAndParent(UUID id) {
+    public List<UUID> getUserIdsByItemId(UUID itemId) {
         try {
-            return itemServiceClient.getTypeAndParent(id);
+            return itemSystemServiceClient.getUserIdsByItemId(itemId);
         } catch (FeignException.NotFound e) {
             throw new ModelNotFoundException();
         } catch (Exception e) {
@@ -49,4 +40,14 @@ public class ItemServiceClientWrapper implements ItemServiceClient {
         }
     }
 
+    @Override
+    public ReminderMailInfo getReminderMailInfo(UUID itemId) {
+        try {
+            return itemSystemServiceClient.getReminderMailInfo(itemId);
+        } catch (FeignException.NotFound e) {
+            throw new ModelNotFoundException();
+        } catch (Exception e) {
+            throw new ClientException();
+        }
+    }
 }

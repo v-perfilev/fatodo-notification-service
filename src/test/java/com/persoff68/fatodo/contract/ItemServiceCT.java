@@ -2,7 +2,6 @@ package com.persoff68.fatodo.contract;
 
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.client.ItemServiceClient;
-import com.persoff68.fatodo.model.ReminderMailInfo;
 import com.persoff68.fatodo.model.TypeAndParent;
 import com.persoff68.fatodo.model.constant.ReminderThreadType;
 import org.junit.jupiter.api.Test;
@@ -46,27 +45,6 @@ class ItemServiceCT {
         TypeAndParent typeAndParent = itemServiceClient.getTypeAndParent(UUID.randomUUID());
         assertThat(typeAndParent.getType()).isEqualTo(ReminderThreadType.ITEM);
         assertThat(typeAndParent.getParentId()).isNotNull();
-    }
-
-    @Test
-    @WithCustomSecurityContext
-    void testGetUserIdsByGroupId() {
-        List<UUID> userIdList = itemServiceClient.getUserIdsByGroupId(UUID.randomUUID());
-        assertThat(userIdList).isNotEmpty();
-    }
-
-    @Test
-    @WithCustomSecurityContext
-    void testGetUserIdsByItemId() {
-        List<UUID> userIdList = itemServiceClient.getUserIdsByItemId(UUID.randomUUID());
-        assertThat(userIdList).isNotEmpty();
-    }
-
-    @Test
-    @WithCustomSecurityContext
-    void testGetReminderMailInfo() {
-        ReminderMailInfo message = itemServiceClient.getReminderMailInfo(UUID.randomUUID());
-        assertThat(message).isNotNull();
     }
 
 }

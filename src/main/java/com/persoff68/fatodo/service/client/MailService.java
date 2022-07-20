@@ -1,6 +1,6 @@
 package com.persoff68.fatodo.service.client;
 
-import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.model.Notification;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MailService {
 
-    private final ItemServiceClient itemServiceClient;
+    private final ItemSystemServiceClient itemSystemServiceClient;
     private final MailServiceClient mailServiceClient;
     private final UserServiceClient userServiceClient;
 
@@ -46,7 +46,7 @@ public class MailService {
         UUID targetId = thread.getTargetId();
         ReminderThreadType type = thread.getType();
         return switch (type) {
-            case ITEM -> itemServiceClient.getReminderMailInfo(targetId);
+            case ITEM -> itemSystemServiceClient.getReminderMailInfo(targetId);
         };
     }
 
