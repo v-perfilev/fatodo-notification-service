@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class ReminderThreadController {
-    static final String ENDPOINT = "/api/threads";
+    static final String ENDPOINT = "/api/thread";
 
     private final ReminderThreadService threadService;
 

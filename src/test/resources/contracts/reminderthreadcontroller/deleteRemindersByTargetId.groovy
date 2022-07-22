@@ -8,8 +8,8 @@ Contract.make {
     request {
         method DELETE()
         url($(
-                consumer(regex("/api/threads/" + uuid().toString() + "/target")),
-                producer("/api/threads/fc2c6859-dcdb-470d-9fc6-cf21a1bf98b0/target")
+                consumer(regex("/api/thread/" + uuid().toString() + "/target")),
+                producer("/api/thread/fc2c6859-dcdb-470d-9fc6-cf21a1bf98b0/target")
         ))
         headers {
             header 'Authorization': $(

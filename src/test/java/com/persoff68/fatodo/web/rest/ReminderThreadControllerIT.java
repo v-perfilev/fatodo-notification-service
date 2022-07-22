@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = FatodoNotificationServiceApplication.class)
 @AutoConfigureMockMvc
 class ReminderThreadControllerIT {
-    private static final String ENDPOINT = "/api/threads";
+    private static final String ENDPOINT = "/api/thread";
 
     private static final UUID PARENT_ID = UUID.randomUUID();
     private static final UUID TARGET_ID = UUID.randomUUID();

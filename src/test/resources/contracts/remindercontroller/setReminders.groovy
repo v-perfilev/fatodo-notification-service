@@ -8,8 +8,8 @@ Contract.make {
     request {
         method PUT()
         url($(
-                consumer(regex("/api/reminders/" + uuid().toString())),
-                producer("/api/reminders/fc2c6859-dcdb-470d-9fc6-cf21a1bf98b0")
+                consumer(regex("/api/reminder/" + uuid().toString())),
+                producer("/api/reminder/fc2c6859-dcdb-470d-9fc6-cf21a1bf98b0")
         ))
         headers {
             contentType applicationJson()

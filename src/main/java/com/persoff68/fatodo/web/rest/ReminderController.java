@@ -1,12 +1,12 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.persoff68.fatodo.mapper.ReminderMapper;
 import com.persoff68.fatodo.model.CalendarReminder;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.dto.CalendarReminderDTO;
 import com.persoff68.fatodo.model.dto.ReminderDTO;
-import com.persoff68.fatodo.mapper.ReminderMapper;
-import com.persoff68.fatodo.service.ReminderService;
 import com.persoff68.fatodo.model.vm.MonthVM;
+import com.persoff68.fatodo.service.ReminderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequestMapping(ReminderController.ENDPOINT)
 @RequiredArgsConstructor
 public class ReminderController {
-    static final String ENDPOINT = "/api/reminders";
+    static final String ENDPOINT = "/api/reminder";
 
     private final ReminderService reminderService;
     private final ReminderMapper reminderMapper;

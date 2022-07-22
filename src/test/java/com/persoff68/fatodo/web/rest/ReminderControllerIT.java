@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = FatodoNotificationServiceApplication.class)
 @AutoConfigureMockMvc
 class ReminderControllerIT {
-    private static final String ENDPOINT = "/api/reminders";
+    private static final String ENDPOINT = "/api/reminder";
 
     private static final UUID PARENT_ID = UUID.randomUUID();
     private static final UUID TARGET_ID = UUID.randomUUID();

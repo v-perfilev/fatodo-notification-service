@@ -7,7 +7,7 @@ Contract.make {
     description 'should return status 200'
     request {
         method POST()
-        url("/api/reminders/calendar")
+        url("/api/reminder/calendar")
         headers {
             contentType applicationJson()
             header 'Authorization': $(
