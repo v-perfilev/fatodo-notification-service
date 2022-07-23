@@ -14,10 +14,10 @@ import java.util.UUID;
         qualifiers = {"feignItemSystemServiceClient"})
 public interface ItemSystemServiceClient {
 
-    @GetMapping(value = "/api/members/group/{groupId}/ids")
+    @GetMapping(value = "/api/member/{groupId}")
     List<UUID> getUserIdsByGroupId(@PathVariable UUID groupId);
 
-    @GetMapping(value = "/api/members/item/{itemId}/ids")
+    @GetMapping(value = "/api/member/{itemId}/item")
     List<UUID> getUserIdsByItemId(@PathVariable UUID itemId);
 
     @GetMapping(value = "/api/info/item-reminder/{itemId}")
