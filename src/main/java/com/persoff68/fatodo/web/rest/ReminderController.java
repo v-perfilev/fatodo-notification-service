@@ -9,7 +9,6 @@ import com.persoff68.fatodo.model.vm.MonthVM;
 import com.persoff68.fatodo.service.ReminderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +31,7 @@ public class ReminderController {
     private final ReminderService reminderService;
     private final ReminderMapper reminderMapper;
 
-    @PostMapping(value = "/calendar", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/calendar")
     public ResponseEntity<List<CalendarReminderDTO>> getAllByMonth(@Valid @RequestBody MonthVM vm) {
         List<CalendarReminder> calendarReminderList = reminderService.getAllCalendarRemindersByMonth(vm.getYear(),
                 vm.getMonth(), vm.getTimezone());
@@ -42,7 +41,7 @@ public class ReminderController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @GetMapping(value = "/{targetId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{targetId}")
     public ResponseEntity<List<ReminderDTO>> getAllByTargetId(@PathVariable UUID targetId) {
         List<Reminder> reminderList = reminderService.getAllByTargetId(targetId);
         List<ReminderDTO> dtoList = reminderList.stream()

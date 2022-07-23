@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         qualifiers = {"feignMailServiceClient"})
 public interface MailServiceClient {
 
-    @PostMapping(value = "/api/mails/notification")
+    @PostMapping(value = "/api/mail/notification")
     void sendNotification(@RequestBody NotificationMail notificationMail);
 
 }
