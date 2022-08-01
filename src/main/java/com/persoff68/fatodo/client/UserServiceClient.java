@@ -14,7 +14,7 @@ import java.util.UUID;
         qualifiers = {"feignUserServiceClient"})
 public interface UserServiceClient {
 
-    @GetMapping(value = "/api/info/user")
+    @GetMapping("/api/info/user")
     List<UserInfo> getAllInfoByIds(@RequestParam("ids") List<UUID> userIdList);
 
 }
