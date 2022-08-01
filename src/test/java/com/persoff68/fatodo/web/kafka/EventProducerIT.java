@@ -106,7 +106,7 @@ class EventProducerIT {
     void testSendReminderEvent_ok() throws Exception {
         notificationService.sendNotifications();
 
-        ConsumerRecord<String, String> record = eventAddRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, String> record = eventAddRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(eventServiceClient).isInstanceOf(EventProducer.class);
         assertThat(record).isNotNull();

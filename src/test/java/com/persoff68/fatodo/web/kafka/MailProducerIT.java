@@ -120,7 +120,7 @@ class MailProducerIT {
         threadRepository.save(thread);
 
         reminderTask.sendNotifications();
-        ConsumerRecord<String, NotificationMail> record = notificationRecords.poll(10, TimeUnit.SECONDS);
+        ConsumerRecord<String, NotificationMail> record = notificationRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(mailServiceClient).isInstanceOf(MailProducer.class);
         assertThat(record).isNotNull();
