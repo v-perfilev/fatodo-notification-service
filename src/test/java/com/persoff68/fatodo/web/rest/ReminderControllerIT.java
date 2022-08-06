@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.persoff68.fatodo.FatodoNotificationServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
-import com.persoff68.fatodo.builder.TestMonthVM;
 import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderDTO;
@@ -22,7 +21,6 @@ import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
 import com.persoff68.fatodo.service.exception.ModelNotFoundException;
-import com.persoff68.fatodo.model.vm.MonthVM;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +42,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,11 +96,8 @@ class ReminderControllerIT {
     @Test
     @WithCustomSecurityContext
     void testGetAllByMonth_ok() throws Exception {
-        String url = ENDPOINT + "/calendar";
-        MonthVM vm = TestMonthVM.defaultBuilder().build().toParent();
-        String requestBody = objectMapper.writeValueAsString(vm);
-        ResultActions resultActions = mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/calendar?year=2090&month=0&timezone=Europe/Berlin";
+        ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
         CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class,
@@ -113,13 +107,18 @@ class ReminderControllerIT {
     }
 
     @Test
+    @WithCustomSecurityContext
+    void testGetAllByMonth_invalid() throws Exception {
+        String url = ENDPOINT + "/calendar?year=2200&month=20&timezone=test";
+        mvc.perform(get(url))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
     @WithAnonymousUser
     void testGetAllByMonth_unauthorized() throws Exception {
-        String url = ENDPOINT + "/calendar";
-        MonthVM vm = TestMonthVM.defaultBuilder().build().toParent();
-        String requestBody = objectMapper.writeValueAsString(vm);
-        mvc.perform(post(url)
-                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+        String url = ENDPOINT + "/calendar?year=2090&month=0&timezone=Europe/Berlin";
+        mvc.perform(get(url))
                 .andExpect(status().isUnauthorized());
     }
 

@@ -5,20 +5,20 @@ import com.persoff68.fatodo.web.rest.validator.util.DateUtils;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class MonthValidator implements ConstraintValidator<MonthConstraint, Integer> {
+public class TimezoneValidator implements ConstraintValidator<TimezoneConstraint, String> {
 
     @Override
-    public void initialize(MonthConstraint dateParams) {
+    public void initialize(TimezoneConstraint dateParams) {
         // unimportant required method
     }
 
     @Override
-    public boolean isValid(Integer input,
+    public boolean isValid(String input,
                            ConstraintValidatorContext cxt) {
         if (input == null) {
             return false;
         }
-        return DateUtils.isMonthValid(input);
+        return DateUtils.isTimezoneValid(input);
     }
 
 }

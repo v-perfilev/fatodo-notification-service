@@ -5,10 +5,10 @@ import com.persoff68.fatodo.web.rest.validator.util.DateUtils;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class MonthValidator implements ConstraintValidator<MonthConstraint, Integer> {
+public class YearValidator implements ConstraintValidator<YearConstraint, Integer> {
 
     @Override
-    public void initialize(MonthConstraint dateParams) {
+    public void initialize(YearConstraint dateParams) {
         // unimportant required method
     }
 
@@ -18,7 +18,7 @@ public class MonthValidator implements ConstraintValidator<MonthConstraint, Inte
         if (input == null) {
             return false;
         }
-        return DateUtils.isMonthValid(input);
+        return DateUtils.isYearValid(input);
     }
 
 }

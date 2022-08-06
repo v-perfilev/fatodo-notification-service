@@ -6,8 +6,11 @@ Contract.make {
     name 'get calendar reminders by month'
     description 'should return status 200'
     request {
-        method POST()
-        url("/api/reminder/calendar")
+        method GET()
+        url($(
+                consumer(regex("/api/reminder/calendar\\?.*")),
+                producer("/api/reminder/calendar?year=2090&month=10&timezone=Europe/Berlin")
+        ))
         headers {
             contentType applicationJson()
             header 'Authorization': $(
@@ -15,20 +18,6 @@ Contract.make {
                     producer("Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4ZjlhN2NhZS03M2M4LTRhZDYtYjEzNS01YmQxMDliNTFkMmUiLCJ1c2VybmFtZSI6InRlc3RfdXNlciIsImF1dGhvcml0aWVzIjoiUk9MRV9VU0VSIiwiaWF0IjowLCJleHAiOjMyNTAzNjc2NDAwfQ.Go0MIqfjREMHOLeqoX2Ej3DbeSG7ZxlL4UAvcxqNeO-RgrKUCrgEu77Ty1vgR_upxVGDAWZS-JfuSYPHSRtv-w")
             )
         }
-        body([
-                "year"    : $(
-                        consumer(anyNumber()),
-                        producer(2090)
-                ),
-                "month"   : $(
-                        consumer(anyNumber()),
-                        producer(10)
-                ),
-                "timezone": $(
-                        consumer(anyNonBlankString()),
-                        producer("Europe/Berlin")
-                ),
-        ])
     }
     response {
         status 200

@@ -7,11 +7,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = MonthValidator.class)
+@Constraint(validatedBy = TimezoneValidator.class)
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MonthConstraint {
-    String message() default "Invalid month";
+public @interface TimezoneConstraint {
+    String message() default "Invalid timezone";
 
     Class<?>[] groups() default {};
 
