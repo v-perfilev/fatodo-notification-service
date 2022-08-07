@@ -74,7 +74,6 @@ public class NotificationService {
             case WEEKLY -> createWeeklyNotifications(reminder, startCalendarOptional);
             case MONTHLY -> createMonthlyNotifications(reminder, startCalendarOptional);
             case YEARLY -> createYearlyNotifications(reminder);
-            default -> throw new ReminderException();
         };
     }
 

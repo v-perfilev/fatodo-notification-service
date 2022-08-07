@@ -76,8 +76,8 @@ public class ReminderService {
         newReminderList.forEach(this::setReminderNotifications);
         newReminderList.forEach(r -> r.setThread(thread));
 
-        thread.getReminders().removeAll(reminderToDeleteList);
-        thread.getReminders().addAll(newReminderList);
+        existingReminderList.removeAll(reminderToDeleteList);
+        existingReminderList.addAll(newReminderList);
         threadRepository.save(thread);
     }
 

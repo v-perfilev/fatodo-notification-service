@@ -19,13 +19,13 @@ public class DateUtils {
 
     public static Date createStartMonthsDate(int year, int month, String timezone) {
         Calendar calendar = createCalendar(timezone);
-        calendar.set(year, month, 1, 0, 0);
+        calendar.set(year, month, 1, 0, 0, 0);
         return Date.from(calendar.toInstant());
     }
 
     public static Date createEndMonthsDate(int year, int month, String timezone) {
         Calendar calendar = createCalendar(timezone);
-        calendar.set(year, month, 1, 0, 0);
+        calendar.set(year, month, 1, 0, 0, 0);
         calendar.add(Calendar.MONTH, 1);
         return Date.from(calendar.toInstant());
     }
@@ -39,7 +39,7 @@ public class DateUtils {
         int hours = getHours(time);
         int minutes = getMinutes(time);
         Calendar calendar = createCalendar(timezone);
-        calendar.set(year, month, date, hours, minutes);
+        calendar.set(year, month, date, hours, minutes, 0);
         return Date.from(calendar.toInstant());
     }
 
@@ -57,7 +57,7 @@ public class DateUtils {
         int minutes = getMinutes(time);
 
         Calendar calendar = createCalendar(timezone);
-        calendar.set(year, month, date, hours, minutes);
+        calendar.set(year, month, date, hours, minutes, 0);
         return Date.from(calendar.toInstant());
     }
 
@@ -74,7 +74,7 @@ public class DateUtils {
         int year = today.get(Calendar.YEAR);
 
         Calendar calendar = createCalendar(timezone);
-        calendar.set(year, month, date, hours, minutes);
+        calendar.set(year, month, date, hours, minutes, 0);
         addConditionalYearOffset(today, year, calendar);
         return Date.from(calendar.toInstant());
     }

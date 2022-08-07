@@ -25,7 +25,7 @@
             <column name="week_days" type="varchar(64)"/>
             <column name="month_days" type="varchar(128)"/>
 
-            <column name="last_notification_date" type="timestamp"/>
+            <column name="last_notification_date" type="datetime"/>
 
             <column name="created_by" type="binary(16)"/>
             <column name="created_at" type="timestamp"/>
