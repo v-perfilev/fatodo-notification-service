@@ -8,7 +8,6 @@ import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.MailService;
-import com.persoff68.fatodo.service.exception.ReminderException;
 import com.persoff68.fatodo.service.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -18,11 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -31,8 +32,6 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class NotificationService {
     private static final int TO_SEND_LIMIT = 100;
-    private static final int WEEK_CALCULATION_PERIOD = 7;
-    private static final int MONTH_CALCULATION_PERIOD = 31;
 
     private final NotificationRepository notificationRepository;
     private final EventService eventService;
@@ -56,23 +55,24 @@ public class NotificationService {
         notificationRepository.deleteSent();
     }
 
-    public List<Notification> generateMonthNotifications(Reminder reminder, String timezone, Date startMonthsDate) {
-        Date reminderCreatedAt = reminder.getCreatedAt();
-        Date relativeDate = reminderCreatedAt.compareTo(startMonthsDate) > 0
-                ? reminderCreatedAt
-                : startMonthsDate;
-        Calendar relativeCalendar = DateUtils.createCalendar(timezone, relativeDate);
-        return generateNotifications(reminder, Optional.of(relativeCalendar));
+    public List<Notification> generatePeriodNotifications(Reminder reminder, String timezone, Date start, Date end) {
+        Date createdAt = reminder.getCreatedAt();
+        Date relativeDate = createdAt.compareTo(start) > 0 ? createdAt : start;
+        Calendar startCalendar = DateUtils.createCalendar(timezone, relativeDate);
+        Calendar endCalendar = DateUtils.createCalendar(timezone, end);
+        int periodInDays = (int) ChronoUnit.DAYS.between(startCalendar.toInstant(), endCalendar.toInstant());
+        return generateNotifications(reminder, Optional.of(startCalendar), periodInDays);
     }
 
     public List<Notification> generateNotifications(Reminder reminder,
-                                                    Optional<Calendar> startCalendarOptional) {
+                                                    Optional<Calendar> startOptional,
+                                                    int periodInDays) {
         Periodicity periodicity = reminder.getPeriodicity();
         return switch (periodicity) {
             case ONCE -> createOnceNotification(reminder);
-            case DAILY -> createDailyNotifications(reminder, startCalendarOptional);
-            case WEEKLY -> createWeeklyNotifications(reminder, startCalendarOptional);
-            case MONTHLY -> createMonthlyNotifications(reminder, startCalendarOptional);
+            case DAILY -> createDailyNotifications(reminder, startOptional, periodInDays);
+            case WEEKLY -> createWeeklyNotifications(reminder, startOptional, periodInDays);
+            case MONTHLY -> createMonthlyNotifications(reminder, startOptional, periodInDays);
             case YEARLY -> createYearlyNotifications(reminder);
         };
     }
@@ -92,36 +92,37 @@ public class NotificationService {
     }
 
     private List<Notification> createDailyNotifications(Reminder reminder,
-                                                        Optional<Calendar> startCalendarOptional) {
+                                                        Optional<Calendar> startOptional,
+                                                        int calculationPeriod) {
         DateParams params = reminder.getDate();
-        int initialIndex = startCalendarOptional.isPresent() ? 0 : 1;
-        int calculationPeriod = startCalendarOptional.isPresent() ? MONTH_CALCULATION_PERIOD : WEEK_CALCULATION_PERIOD;
-        return IntStream.rangeClosed(initialIndex, calculationPeriod)
-                .mapToObj(i -> DateUtils.createRelativeDate(params, i, startCalendarOptional))
+        return IntStream.rangeClosed(0, calculationPeriod)
+                .mapToObj(i -> DateUtils.createRelativeDate(params, startOptional, i))
+                .filter(Objects::nonNull)
                 .map(date -> new Notification(reminder, date))
                 .toList();
     }
 
     private List<Notification> createWeeklyNotifications(Reminder reminder,
-                                                         Optional<Calendar> startCalendarOptional) {
+                                                         Optional<Calendar> startOptional,
+                                                         int calculationPeriod) {
         DateParams params = reminder.getDate();
         List<Integer> weekDays = reminder.getWeekDays();
-        int initialIndex = startCalendarOptional.isPresent() ? 0 : 1;
-        int calculationPeriod = startCalendarOptional.isPresent() ? MONTH_CALCULATION_PERIOD : WEEK_CALCULATION_PERIOD;
-        return IntStream.rangeClosed(initialIndex, calculationPeriod)
-                .mapToObj(i -> DateUtils.createRelativeDate(params, i, startCalendarOptional))
+        return IntStream.rangeClosed(0, calculationPeriod)
+                .mapToObj(i -> DateUtils.createRelativeDate(params, startOptional, i))
+                .filter(Objects::nonNull)
                 .filter(weekDaysFilter(weekDays))
                 .map(instant -> new Notification(reminder, instant))
                 .toList();
     }
 
     private List<Notification> createMonthlyNotifications(Reminder reminder,
-                                                          Optional<Calendar> startCalendarOptional) {
+                                                          Optional<Calendar> startOptional,
+                                                          int calculationPeriod) {
         DateParams params = reminder.getDate();
         List<Integer> monthDays = reminder.getMonthDays();
-        int initialIndex = startCalendarOptional.isPresent() ? 0 : 1;
-        return IntStream.rangeClosed(initialIndex, MONTH_CALCULATION_PERIOD)
-                .mapToObj(i -> DateUtils.createRelativeDate(params, i, startCalendarOptional))
+        return IntStream.rangeClosed(0, calculationPeriod)
+                .mapToObj(i -> DateUtils.createRelativeDate(params, startOptional, i))
+                .filter(Objects::nonNull)
                 .filter(monthDaysFilter(monthDays))
                 .map(instant -> new Notification(reminder, instant))
                 .toList();

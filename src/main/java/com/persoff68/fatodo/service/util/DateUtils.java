@@ -43,11 +43,10 @@ public class DateUtils {
         return Date.from(calendar.toInstant());
     }
 
-    public static Date createRelativeDate(DateParams dateParams, int addDays,
-                                          Optional<Calendar> startCalendarOptional) {
+    public static Date createRelativeDate(DateParams dateParams, Optional<Calendar> startOptional, int addDays) {
         String timezone = dateParams.getTimezone();
 
-        Calendar startCalendar = (Calendar) startCalendarOptional.orElse(createCalendar(timezone)).clone();
+        Calendar startCalendar = (Calendar) startOptional.orElse(createCalendar(timezone)).clone();
         startCalendar.add(Calendar.DAY_OF_MONTH, addDays);
         int date = startCalendar.get(Calendar.DAY_OF_MONTH);
         int month = startCalendar.get(Calendar.MONTH);
@@ -58,7 +57,11 @@ public class DateUtils {
 
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes, 0);
-        return Date.from(calendar.toInstant());
+        Instant resultInstant = calendar.toInstant();
+
+        return startOptional.isPresent() || resultInstant.isAfter(Instant.now())
+                ? Date.from(resultInstant)
+                : null;
     }
 
     public static Date createYearlyDate(DateParams dateParams) {

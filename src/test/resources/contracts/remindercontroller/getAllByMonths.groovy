@@ -9,7 +9,7 @@ Contract.make {
         method GET()
         url($(
                 consumer(regex("/api/reminder/calendar\\?.*")),
-                producer("/api/reminder/calendar?year=2090&month=10&timezone=Europe/Berlin")
+                producer("/api/reminder/calendar?yearFrom=2090&monthFrom=10&yearTo=2090&monthTo=10&timezone=Europe/Berlin")
         ))
         headers {
             contentType applicationJson()
@@ -22,13 +22,13 @@ Contract.make {
     response {
         status 200
         body([
-                [
-                        "parentId"   : anyUuid(),
-                        "targetId"   : anyUuid(),
-                        "periodicity": anyNonBlankString(),
-                        "type"       : anyNonBlankString(),
-                        "date"       : anyNonBlankString()
-                ]
+                "2090_10": [[
+                                    "parentId"   : anyUuid(),
+                                    "targetId"   : anyUuid(),
+                                    "periodicity": anyNonBlankString(),
+                                    "type"       : anyNonBlankString(),
+                                    "date"       : anyNonBlankString()
+                            ]]
         ])
     }
 }

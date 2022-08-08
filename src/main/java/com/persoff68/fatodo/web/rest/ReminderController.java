@@ -1,5 +1,8 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.persoff68.fatodo.mapper.ReminderMapper;
 import com.persoff68.fatodo.model.CalendarReminder;
 import com.persoff68.fatodo.model.Reminder;
@@ -21,8 +24,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 @RestController
 @RequestMapping(ReminderController.ENDPOINT)
@@ -35,16 +42,22 @@ public class ReminderController {
     private final ReminderMapper reminderMapper;
 
     @GetMapping(value = "/calendar")
-    public ResponseEntity<List<CalendarReminderDTO>> getAllByMonth(
-            @RequestParam("year") @YearConstraint Integer year,
-            @RequestParam("month") @MonthConstraint Integer month,
+    public ResponseEntity<Multimap<String, CalendarReminderDTO>> getAllByMonths(
+            @RequestParam("yearFrom") @YearConstraint Integer yearFrom,
+            @RequestParam("monthFrom") @MonthConstraint Integer monthFrom,
+            @RequestParam("yearTo") @YearConstraint Integer yearTo,
+            @RequestParam("monthTo") @MonthConstraint Integer monthTo,
             @RequestParam("timezone") @TimezoneConstraint String timezone
     ) {
-        List<CalendarReminder> calendarReminderList = reminderService.getAllCalendarRemindersByMonth(year, month,
-                timezone);
-        List<CalendarReminderDTO> dtoList = calendarReminderList.stream()
+        List<CalendarReminder> calendarReminderList = reminderService.getAllCalendarRemindersByMonths(yearFrom,
+                monthFrom, yearTo, monthTo, timezone);
+        Multimap<String, CalendarReminderDTO> dtoList = calendarReminderList.stream()
                 .map(reminderMapper::calendarPojoToDTO)
-                .toList();
+                .collect(Multimaps.toMultimap(
+                        ReminderController::buildMonthKey,
+                        Function.identity(),
+                        HashMultimap::create
+                ));
         return ResponseEntity.ok(dtoList);
     }
 
@@ -65,6 +78,16 @@ public class ReminderController {
                 .toList();
         reminderService.setReminders(targetId, reminderList);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+    private static String buildMonthKey(CalendarReminderDTO calendarReminderDTO) {
+        Date date = calendarReminderDTO.getDate();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        return year + "_" + month;
     }
 
 }

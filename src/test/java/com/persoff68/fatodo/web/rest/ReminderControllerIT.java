@@ -1,7 +1,9 @@
 package com.persoff68.fatodo.web.rest;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.google.common.collect.Multimap;
 import com.persoff68.fatodo.FatodoNotificationServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
 import com.persoff68.fatodo.builder.TestNotification;
@@ -95,21 +97,23 @@ class ReminderControllerIT {
 
     @Test
     @WithCustomSecurityContext
-    void testGetAllByMonth_ok() throws Exception {
-        String url = ENDPOINT + "/calendar?year=2090&month=0&timezone=Europe/Berlin";
+    void testGetAllByMonths_ok() throws Exception {
+        String url = ENDPOINT + "/calendar?yearFrom=2090&monthFrom=0&yearTo=2090&monthTo=1&timezone=Europe/Berlin";
         ResultActions resultActions = mvc.perform(get(url))
                 .andExpect(status().isOk());
         String resultString = resultActions.andReturn().getResponse().getContentAsString();
-        CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class,
+        JavaType javaType = objectMapper.getTypeFactory().constructMapLikeType(Multimap.class, String.class,
                 CalendarReminderDTO.class);
-        List<CalendarReminderDTO> resultList = objectMapper.readValue(resultString, collectionType);
-        assertThat(resultList).hasSize(31);
+        Multimap<String, CalendarReminderDTO> resultMultimap = objectMapper.readValue(resultString, javaType);
+        assertThat(resultMultimap.keySet()).hasSize(2);
+        assertThat(resultMultimap.get("2090_0")).hasSize(31);
+        assertThat(resultMultimap.get("2090_1")).hasSize(28);
     }
 
     @Test
     @WithCustomSecurityContext
-    void testGetAllByMonth_invalid() throws Exception {
-        String url = ENDPOINT + "/calendar?year=2200&month=20&timezone=test";
+    void testGetAllByMonths_invalid() throws Exception {
+        String url = ENDPOINT + "/calendar?yearFrom=2090&monthFrom=0&monthTo=1&timezone=Europe/Berlin";
         mvc.perform(get(url))
                 .andExpect(status().isInternalServerError());
     }

@@ -27,6 +27,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ReminderService {
+    private static final int WEEK_CALCULATION_PERIOD = 7;
     private static final int EXPIRED_LIMIT = 100;
 
     private final ReminderThreadService threadService;
@@ -36,19 +37,20 @@ public class ReminderService {
     private final ReminderRepository reminderRepository;
 
     @Transactional
-    public List<CalendarReminder> getAllCalendarRemindersByMonth(int year, int month, String timezone) {
+    public List<CalendarReminder> getAllCalendarRemindersByMonths(int yearFrom, int monthFrom,
+                                                                  int yearTo, int monthTo,
+                                                                  String timezone) {
         List<UUID> parentIdList = permissionService.getParentIds();
         List<CalendarReminder> resultList = new ArrayList<>();
         if (!parentIdList.isEmpty()) {
-            Date startMonthsDate = DateUtils.createStartMonthsDate(year, month, timezone);
-            Date endMonthsDate = DateUtils.createEndMonthsDate(year, month, timezone);
-            List<Reminder> reminderList = reminderRepository.findAllByParentIds(parentIdList, endMonthsDate);
+            Date start = DateUtils.createStartMonthsDate(yearFrom, monthFrom, timezone);
+            Date end = DateUtils.createEndMonthsDate(yearTo, monthTo, timezone);
+            List<Reminder> reminderList = reminderRepository.findAllByParentIds(parentIdList, end);
             List<CalendarReminder> calendarReminderList =
                     reminderList.stream()
-                            .map(r -> notificationService.generateMonthNotifications(r, timezone, startMonthsDate))
+                            .map(r -> notificationService.generatePeriodNotifications(r, timezone, start, end))
                             .flatMap(Collection::stream)
-                            .filter(n -> n.getDate().compareTo(startMonthsDate) >= 0
-                                    && n.getDate().compareTo(endMonthsDate) <= 0)
+                            .filter(n -> n.getDate().compareTo(start) >= 0 && n.getDate().compareTo(end) <= 0)
                             .sorted(Comparator.comparing(Notification::getDate))
                             .map(CalendarReminder::new).toList();
             resultList.addAll(calendarReminderList);
@@ -91,7 +93,7 @@ public class ReminderService {
 
     private void setReminderNotifications(Reminder reminder) {
         List<Notification> notificationList = notificationService
-                .generateNotifications(reminder, Optional.empty());
+                .generateNotifications(reminder, Optional.empty(), WEEK_CALCULATION_PERIOD);
         Date lastNotificationDate = reminder.getPeriodicity().equals(Periodicity.ONCE)
                 ? Date.from(ZonedDateTime.now().plusYears(100).toInstant())
                 : notificationService.maxNotificationDate(notificationList);
