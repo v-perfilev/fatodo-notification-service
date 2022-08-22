@@ -10,6 +10,7 @@ import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;
 import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderMailInfo;
@@ -60,6 +61,8 @@ class ReminderTaskIT {
     UserServiceClient userServiceClient;
     @MockBean
     EventServiceClient eventServiceClient;
+    @MockBean
+    WsServiceClient wsServiceClient;
 
     ReminderThread thread;
 

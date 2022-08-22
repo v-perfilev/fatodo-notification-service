@@ -8,6 +8,7 @@ import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.MailService;
+import com.persoff68.fatodo.service.client.WsService;
 import com.persoff68.fatodo.service.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final EventService eventService;
     private final MailService mailService;
+    private final WsService wsService;
 
     @Transactional
     public void sendNotifications() {
@@ -44,8 +46,9 @@ public class NotificationService {
         setNotificationsToPending(notificationList);
         notificationList.parallelStream().forEach(notification -> {
             Reminder reminder = notification.getReminder();
-            eventService.sendReminderEvent(reminder);
             mailService.sendNotification(notification);
+            wsService.sendReminderEvent(reminder);
+            eventService.sendReminderEvent(reminder);
         });
         setNotificationsToSent(notificationList);
     }

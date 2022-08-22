@@ -4,6 +4,7 @@ import com.persoff68.fatodo.config.annotation.ConditionalOnPropertyNotNull;
 import com.persoff68.fatodo.config.constant.KafkaTopics;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.NotificationMail;
+import com.persoff68.fatodo.model.WsEventWithUsersDTO;
 import com.persoff68.fatodo.model.dto.CreateReminderEventDTO;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,12 +41,22 @@ public class KafkaConfiguration {
     }
 
     @Bean
+    public NewTopic wsNewTopic() {
+        return KafkaUtils.buildTopic(KafkaTopics.WS.getValue(), partitions);
+    }
+
+    @Bean
     public KafkaTemplate<String, NotificationMail> notificationMailKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
 
     @Bean
     public KafkaTemplate<String, CreateReminderEventDTO> eventReminderKafkaTemplate() {
+        return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
+    }
+
+    @Bean
+    public KafkaTemplate<String, WsEventWithUsersDTO> wsKafkaTemplate() {
         return KafkaUtils.buildJsonKafkaTemplate(bootstrapAddress);
     }
 
