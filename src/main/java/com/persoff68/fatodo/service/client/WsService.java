@@ -4,9 +4,9 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.mapper.ReminderMapper;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderThread;
-import com.persoff68.fatodo.model.WsEventDTO;
 import com.persoff68.fatodo.model.constant.WsEventType;
 import com.persoff68.fatodo.model.dto.ReminderDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +22,7 @@ public class WsService {
     private final ReminderMapper reminderMapper;
 
     public void sendReminderEvent(Reminder reminder) {
-        ReminderThread thread = reminder.getThread();
-        List<UUID> userIdList = permissionService.getThreadUserIds(thread);
+        List<UUID> userIdList = permissionService.getThreadUserIds(reminder.getThread());
         ReminderDTO reminderDTO = reminderMapper.pojoToDTO(reminder);
         WsEventDTO dto = new WsEventDTO(userIdList, WsEventType.REMINDER, reminderDTO);
         wsServiceClient.sendEvent(dto);

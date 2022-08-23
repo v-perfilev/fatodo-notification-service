@@ -1,5 +1,6 @@
 package com.persoff68.fatodo.web.kafka;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
@@ -10,6 +11,7 @@ import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderThread;
+import com.persoff68.fatodo.model.dto.EventDTO;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
@@ -75,8 +77,8 @@ class EventProducerIT {
     @SpyBean
     EventServiceClient eventServiceClient;
 
-    private ConcurrentMessageListenerContainer<String, String> eventAddContainer;
-    private BlockingQueue<ConsumerRecord<String, String>> eventAddRecords;
+    private ConcurrentMessageListenerContainer<String, EventDTO> eventContainer;
+    private BlockingQueue<ConsumerRecord<String, EventDTO>> eventRecords;
 
     @BeforeEach
     void setup() {
@@ -90,7 +92,7 @@ class EventProducerIT {
 
         doNothing().when(mailService).sendNotification(any());
 
-        startEventAddConsumer();
+        startEventConsumer();
     }
 
     @AfterEach
@@ -99,33 +101,34 @@ class EventProducerIT {
         reminderRepository.deleteAll();
         threadRepository.deleteAll();
 
-        stopEventAddConsumer();
+        stopEventConsumer();
     }
 
     @Test
-    void testSendReminderEvent_ok() throws Exception {
+    void testAddEvent_ok() throws Exception {
         notificationService.sendNotifications();
 
-        ConsumerRecord<String, String> record = eventAddRecords.poll(5, TimeUnit.SECONDS);
+        ConsumerRecord<String, EventDTO> record = eventRecords.poll(5, TimeUnit.SECONDS);
 
         assertThat(eventServiceClient).isInstanceOf(EventProducer.class);
         assertThat(record).isNotNull();
-        assertThat(record.key()).isEqualTo("reminder");
-        verify(eventServiceClient).addReminderEvent(any());
+        verify(eventServiceClient).addEvent(any());
     }
 
-    private void startEventAddConsumer() {
-        ConcurrentKafkaListenerContainerFactory<String, String> stringContainerFactory =
-                KafkaUtils.buildStringContainerFactory(embeddedKafkaBroker.getBrokersAsString(), "test", "earliest");
-        eventAddContainer = stringContainerFactory.createContainer("event_add");
-        eventAddRecords = new LinkedBlockingQueue<>();
-        eventAddContainer.setupMessageListener((MessageListener<String, String>) eventAddRecords::add);
-        eventAddContainer.start();
-        ContainerTestUtils.waitForAssignment(eventAddContainer, embeddedKafkaBroker.getPartitionsPerTopic());
+    private void startEventConsumer() {
+        JavaType javaType = objectMapper.getTypeFactory().constructType(EventDTO.class);
+        ConcurrentKafkaListenerContainerFactory<String, EventDTO> containerFactory =
+                KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(),
+                        "test", "earliest", javaType);
+        eventContainer = containerFactory.createContainer("event");
+        eventRecords = new LinkedBlockingQueue<>();
+        eventContainer.setupMessageListener((MessageListener<String, EventDTO>) eventRecords::add);
+        eventContainer.start();
+        ContainerTestUtils.waitForAssignment(eventContainer, embeddedKafkaBroker.getPartitionsPerTopic());
     }
 
-    private void stopEventAddConsumer() {
-        eventAddContainer.stop();
+    private void stopEventConsumer() {
+        eventContainer.stop();
     }
 
 }

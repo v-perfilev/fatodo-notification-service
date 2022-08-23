@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.builder;
 
-import com.persoff68.fatodo.model.WsEventDTO;
 import com.persoff68.fatodo.model.constant.WsEventType;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import lombok.Builder;
 
 import java.util.List;
@@ -25,6 +25,8 @@ public class TestWsEventDTO extends WsEventDTO {
         dto.setUserIds(getUserIds());
         dto.setType(getType());
         dto.setPayload(getPayload());
+        dto.setUserId(getUserId());
+        dto.setDate(getDate());
         return dto;
     }
 

@@ -36,7 +36,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,8 +74,6 @@ class ReminderTaskIT {
         when(itemSystemServiceClient.getReminderMailInfo(any())).thenReturn(message);
         UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
-        doNothing().when(mailServiceClient).sendNotification(any());
-        doNothing().when(eventServiceClient).addReminderEvent(any());
     }
 
     @AfterEach

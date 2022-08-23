@@ -47,8 +47,11 @@ public class NotificationService {
         notificationList.parallelStream().forEach(notification -> {
             Reminder reminder = notification.getReminder();
             mailService.sendNotification(notification);
-            wsService.sendReminderEvent(reminder);
+
+            // EVENT
             eventService.sendReminderEvent(reminder);
+            // WS
+            wsService.sendReminderEvent(reminder);
         });
         setNotificationsToSent(notificationList);
     }

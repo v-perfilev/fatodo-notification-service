@@ -1,9 +1,11 @@
 package com.persoff68.fatodo.service.client;
 
 import com.persoff68.fatodo.client.EventServiceClient;
+import com.persoff68.fatodo.mapper.ReminderMapper;
 import com.persoff68.fatodo.model.Reminder;
-import com.persoff68.fatodo.model.ReminderThread;
-import com.persoff68.fatodo.model.dto.CreateReminderEventDTO;
+import com.persoff68.fatodo.model.constant.EventType;
+import com.persoff68.fatodo.model.dto.EventDTO;
+import com.persoff68.fatodo.model.dto.ReminderDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +18,13 @@ public class EventService {
 
     private final EventServiceClient eventServiceClient;
     private final PermissionService permissionService;
+    private final ReminderMapper reminderMapper;
 
     public void sendReminderEvent(Reminder reminder) {
-        ReminderThread thread = reminder.getThread();
-        UUID groupId = thread.getParentId();
-        UUID itemId = thread.getTargetId();
-        List<UUID> recipientIdList = permissionService.getThreadUserIds(thread);
-        CreateReminderEventDTO dto = CreateReminderEventDTO.reminder(recipientIdList, groupId, itemId);
-        eventServiceClient.addReminderEvent(dto);
+        List<UUID> userIdList = permissionService.getThreadUserIds(reminder.getThread());
+        ReminderDTO reminderDTO = reminderMapper.pojoToDTO(reminder);
+        EventDTO dto = new EventDTO(userIdList, EventType.REMINDER, reminderDTO);
+        eventServiceClient.addEvent(dto);
     }
 
 }

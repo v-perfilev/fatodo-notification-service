@@ -12,7 +12,7 @@ import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderThread;
-import com.persoff68.fatodo.model.WsEventDTO;
+import com.persoff68.fatodo.model.dto.WsEventDTO;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
@@ -117,10 +117,10 @@ class WsProducerIT {
 
     private void startWsConsumer() {
         JavaType javaType = objectMapper.getTypeFactory().constructType(WsEventDTO.class);
-        ConcurrentKafkaListenerContainerFactory<String, WsEventDTO> stringContainerFactory =
+        ConcurrentKafkaListenerContainerFactory<String, WsEventDTO> containerFactory =
                 KafkaUtils.buildJsonContainerFactory(embeddedKafkaBroker.getBrokersAsString(),
                         "test", "earliest", javaType);
-        wsContainer = stringContainerFactory.createContainer("ws");
+        wsContainer = containerFactory.createContainer("ws");
         wsRecords = new LinkedBlockingQueue<>();
         wsContainer.setupMessageListener((MessageListener<String, WsEventDTO>) wsRecords::add);
         wsContainer.start();
