@@ -11,7 +11,7 @@ import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderThread;
-import com.persoff68.fatodo.model.dto.EventDTO;
+import com.persoff68.fatodo.model.dto.event.EventDTO;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;

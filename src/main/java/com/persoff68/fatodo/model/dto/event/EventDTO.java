@@ -1,4 +1,4 @@
-package com.persoff68.fatodo.model.dto;
+package com.persoff68.fatodo.model.dto.event;
 
 import com.persoff68.fatodo.model.constant.EventType;
 import lombok.Data;
@@ -16,13 +16,13 @@ public class EventDTO {
 
     private EventType type;
 
-    private Object payload;
+    private String payload;
 
     private UUID userId;
 
     private Date date;
 
-    public EventDTO(List<UUID> userIds, EventType type, Object payload) {
+    public EventDTO(List<UUID> userIds, EventType type, String payload) {
         this.userIds = userIds;
         this.type = type;
         this.payload = payload;
