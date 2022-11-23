@@ -66,6 +66,12 @@ public class Reminder extends AbstractAuditingModel {
     }
 
     private static boolean integerListsEqual(List<Integer> list1, List<Integer> list2) {
+        if (list1 == null && list2 == null) {
+            return true;
+        }
+        if (list1 == null || list2 == null) {
+            return false;
+        }
         List<Integer> sortedList1 = list1.stream().sorted().toList();
         List<Integer> sortedList2 = list2.stream().sorted().toList();
         return sortedList1.equals(sortedList2);
