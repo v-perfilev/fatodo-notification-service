@@ -5,6 +5,7 @@ import com.persoff68.fatodo.model.DateParams;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -20,14 +21,14 @@ public class DateUtils {
     public static Date createStartMonthsDate(int year, int month, String timezone) {
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, 1, 0, 0, 0);
-        return Date.from(calendar.toInstant());
+        return convertCalendarToDate(calendar);
     }
 
     public static Date createEndMonthsDate(int year, int month, String timezone) {
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, 1, 0, 0, 0);
         calendar.add(Calendar.MONTH, 1);
-        return Date.from(calendar.toInstant());
+        return convertCalendarToDate(calendar);
     }
 
     public static Date createDate(DateParams dateParams) {
@@ -40,7 +41,7 @@ public class DateUtils {
         int minutes = getMinutes(time);
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes, 0);
-        return Date.from(calendar.toInstant());
+        return convertCalendarToDate(calendar);
     }
 
     public static Date createRelativeDate(DateParams dateParams, Optional<Calendar> startOptional, int addDays) {
@@ -57,7 +58,7 @@ public class DateUtils {
 
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes, 0);
-        Instant resultInstant = calendar.toInstant();
+        Instant resultInstant = calendar.toInstant().truncatedTo(ChronoUnit.SECONDS);
 
         return startOptional.isPresent() || resultInstant.isAfter(Instant.now())
                 ? Date.from(resultInstant)
@@ -79,7 +80,7 @@ public class DateUtils {
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes, 0);
         addConditionalYearOffset(today, year, calendar);
-        return Date.from(calendar.toInstant());
+        return convertCalendarToDate(calendar);
     }
 
     private static Calendar createCalendar(String timezone) {
@@ -104,6 +105,11 @@ public class DateUtils {
         if (today.compareTo(calendar) > 0) {
             calendar.set(Calendar.YEAR, year + 1);
         }
+    }
+
+    private static Date convertCalendarToDate(Calendar calendar) {
+        Instant instant = calendar.toInstant().truncatedTo(ChronoUnit.SECONDS);
+        return Date.from(instant);
     }
 
 }

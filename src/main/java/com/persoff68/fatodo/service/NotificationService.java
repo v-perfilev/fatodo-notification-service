@@ -65,8 +65,10 @@ public class NotificationService {
         Date createdAt = reminder.getCreatedAt();
         Date relativeDate = createdAt.compareTo(start) > 0 ? createdAt : start;
         Calendar startCalendar = DateUtils.createCalendar(timezone, relativeDate);
+        Instant startInstant = startCalendar.toInstant().truncatedTo(ChronoUnit.SECONDS);
         Calendar endCalendar = DateUtils.createCalendar(timezone, end);
-        int periodInDays = (int) ChronoUnit.DAYS.between(startCalendar.toInstant(), endCalendar.toInstant());
+        Instant endInstant = endCalendar.toInstant().truncatedTo(ChronoUnit.SECONDS);
+        int periodInDays = (int) ChronoUnit.DAYS.between(startInstant, endInstant);
         return generateNotifications(reminder, Optional.of(startCalendar), periodInDays);
     }
 

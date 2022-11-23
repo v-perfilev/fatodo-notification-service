@@ -50,9 +50,10 @@ public class ReminderService {
                     reminderList.stream()
                             .map(r -> notificationService.generatePeriodNotifications(r, timezone, start, end))
                             .flatMap(Collection::stream)
-                            .filter(n -> n.getDate().compareTo(start) >= 0 && n.getDate().compareTo(end) <= 0)
+                            .filter(n -> n.getDate().compareTo(start) >= 0 && n.getDate().compareTo(end) < 0)
                             .sorted(Comparator.comparing(Notification::getDate))
-                            .map(CalendarReminder::new).toList();
+                            .map(CalendarReminder::new)
+                            .toList();
             resultList.addAll(calendarReminderList);
         }
         return resultList;
