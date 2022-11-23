@@ -24,8 +24,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
@@ -49,15 +52,22 @@ public class ReminderController {
             @RequestParam("monthTo") @MonthConstraint Integer monthTo,
             @RequestParam("timezone") @TimezoneConstraint String timezone
     ) {
-        List<CalendarReminder> calendarReminderList = reminderService.getAllCalendarRemindersByMonths(yearFrom,
-                monthFrom, yearTo, monthTo, timezone);
+        List<CalendarReminder> calendarReminderList = reminderService.getAllCalendarRemindersByMonths(
+                yearFrom,
+                monthFrom,
+                yearTo,
+                monthTo,
+                timezone
+        );
+
         Multimap<String, CalendarReminderDTO> dtoList = calendarReminderList.stream()
                 .map(reminderMapper::calendarPojoToDTO)
                 .collect(Multimaps.toMultimap(
-                        ReminderController::buildMonthKey,
+                        r -> buildMonthKey(r, timezone),
                         Function.identity(),
                         HashMultimap::create
                 ));
+
         return ResponseEntity.ok(dtoList);
     }
 
@@ -80,11 +90,10 @@ public class ReminderController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
-    private static String buildMonthKey(CalendarReminderDTO calendarReminderDTO) {
-        Date date = calendarReminderDTO.getDate();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
+    private static String buildMonthKey(CalendarReminderDTO calendarReminderDTO, String timezone) {
+        Instant instant = calendarReminderDTO.getDate().toInstant().truncatedTo(ChronoUnit.SECONDS);
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of(timezone));
+        Calendar calendar = GregorianCalendar.from(zonedDateTime);
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         return year + "_" + month;
