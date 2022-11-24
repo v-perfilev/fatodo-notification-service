@@ -1,10 +1,14 @@
 package com.persoff68.fatodo.service;
 
+import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.model.DateParams;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
+import com.persoff68.fatodo.model.ReminderInfo;
+import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.constant.NotificationStatus;
 import com.persoff68.fatodo.model.constant.Periodicity;
+import com.persoff68.fatodo.model.constant.ReminderThreadType;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.service.client.EventService;
 import com.persoff68.fatodo.service.client.MailService;
@@ -26,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
@@ -33,6 +38,8 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class NotificationService {
     private static final int TO_SEND_LIMIT = 100;
+
+    private final ItemSystemServiceClient itemSystemServiceClient;
 
     private final NotificationRepository notificationRepository;
     private final EventService eventService;
@@ -46,12 +53,14 @@ public class NotificationService {
         setNotificationsToPending(notificationList);
         notificationList.parallelStream().forEach(notification -> {
             Reminder reminder = notification.getReminder();
-            mailService.sendNotification(notification);
+            ReminderInfo reminderInfo = getReminderInfoByThread(reminder.getThread());
 
+            // MAIL
+            mailService.sendNotification(reminderInfo);
             // EVENT
-            eventService.sendReminderEvent(reminder);
+            eventService.sendReminderEvent(reminderInfo);
             // WS
-            wsService.sendReminderEvent(reminder);
+            wsService.sendReminderEvent(reminderInfo);
         });
         setNotificationsToSent(notificationList);
     }
@@ -173,6 +182,14 @@ public class NotificationService {
     private Date createDatePlusWeek() {
         Instant instant = ZonedDateTime.now().plusWeeks(1).toInstant();
         return Date.from(instant);
+    }
+
+    private ReminderInfo getReminderInfoByThread(ReminderThread thread) {
+        UUID targetId = thread.getTargetId();
+        ReminderThreadType type = thread.getType();
+        return switch (type) {
+            case ITEM -> itemSystemServiceClient.getReminderMailInfo(targetId);
+        };
     }
 
 }

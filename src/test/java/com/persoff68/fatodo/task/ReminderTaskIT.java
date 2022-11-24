@@ -3,7 +3,7 @@ package com.persoff68.fatodo.task;
 import com.persoff68.fatodo.FatodoNotificationServiceApplication;
 import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
-import com.persoff68.fatodo.builder.TestReminderMailInfo;
+import com.persoff68.fatodo.builder.TestReminderInfo;
 import com.persoff68.fatodo.builder.TestReminderThread;
 import com.persoff68.fatodo.builder.TestUserInfo;
 import com.persoff68.fatodo.client.EventServiceClient;
@@ -13,7 +13,7 @@ import com.persoff68.fatodo.client.UserServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
-import com.persoff68.fatodo.model.ReminderMailInfo;
+import com.persoff68.fatodo.model.ReminderInfo;
 import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.UserInfo;
 import com.persoff68.fatodo.model.constant.NotificationStatus;
@@ -70,7 +70,7 @@ class ReminderTaskIT {
         thread = TestReminderThread.defaultBuilder().build().toParent();
         thread = threadRepository.save(thread);
 
-        ReminderMailInfo message = TestReminderMailInfo.defaultBuilder().build().toParent();
+        ReminderInfo message = TestReminderInfo.defaultBuilder().build().toParent();
         when(itemSystemServiceClient.getReminderMailInfo(any())).thenReturn(message);
         UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
