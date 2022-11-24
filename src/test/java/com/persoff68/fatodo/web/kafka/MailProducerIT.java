@@ -96,8 +96,8 @@ class MailProducerIT {
         thread = TestReminderThread.defaultBuilder().build().toParent();
         threadRepository.save(thread);
 
-        ReminderInfo message = TestReminderInfo.defaultBuilder().build().toParent();
-        when(itemSystemServiceClient.getReminderMailInfo(any())).thenReturn(message);
+        ReminderInfo reminderInfo = TestReminderInfo.defaultBuilder().build().toParent();
+        when(itemSystemServiceClient.getReminderMailInfo(any())).thenReturn(reminderInfo);
         UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
         when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
 

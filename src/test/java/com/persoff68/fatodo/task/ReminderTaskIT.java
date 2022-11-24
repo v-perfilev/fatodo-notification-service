@@ -19,7 +19,6 @@ import com.persoff68.fatodo.model.UserInfo;
 import com.persoff68.fatodo.model.constant.NotificationStatus;
 import com.persoff68.fatodo.model.constant.Periodicity;
 import com.persoff68.fatodo.repository.NotificationRepository;
-import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.AfterEach;
@@ -36,6 +35,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,8 +47,6 @@ class ReminderTaskIT {
 
     @Autowired
     ReminderThreadRepository threadRepository;
-    @Autowired
-    ReminderRepository reminderRepository;
     @Autowired
     NotificationRepository notificationRepository;
 
@@ -92,7 +90,10 @@ class ReminderTaskIT {
 
         reminderTask.sendNotifications();
 
-        verify(mailServiceClient).sendNotification(any());
+        verify(mailServiceClient, timeout(1000)).sendNotification(any());
+        verify(eventServiceClient, timeout(1000)).addEvent(any());
+        verify(wsServiceClient, timeout(1000)).sendEvent(any());
+
         List<Notification> notificationList = notificationRepository.findAll();
         Condition<Notification> sentCondition = new Condition<>(
                 n -> n.getStatus().equals(NotificationStatus.SENT),
@@ -133,3 +134,5 @@ class ReminderTaskIT {
     }
 
 }
+
+

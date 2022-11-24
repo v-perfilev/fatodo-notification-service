@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
+import com.persoff68.fatodo.builder.TestReminderInfo;
 import com.persoff68.fatodo.builder.TestReminderThread;
 import com.persoff68.fatodo.client.EventServiceClient;
 import com.persoff68.fatodo.client.ItemSystemServiceClient;
@@ -11,6 +12,7 @@ import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
+import com.persoff68.fatodo.model.ReminderInfo;
 import com.persoff68.fatodo.model.ReminderThread;
 import com.persoff68.fatodo.model.dto.event.WsEventDTO;
 import com.persoff68.fatodo.repository.NotificationRepository;
@@ -44,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(properties = {
         "kafka.bootstrapAddress=localhost:9092",
@@ -91,6 +94,9 @@ class WsProducerIT {
         reminder.setNotifications(List.of(notification));
         thread.setReminders(List.of(reminder));
         threadRepository.save(thread);
+
+        ReminderInfo reminderInfo = TestReminderInfo.defaultBuilder().build().toParent();
+        when(itemSystemServiceClient.getReminderMailInfo(any())).thenReturn(reminderInfo);
 
         startWsConsumer();
     }
