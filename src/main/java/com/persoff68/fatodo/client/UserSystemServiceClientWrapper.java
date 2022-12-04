@@ -1,7 +1,7 @@
 package com.persoff68.fatodo.client;
 
 import com.persoff68.fatodo.exception.ClientException;
-import com.persoff68.fatodo.model.UserInfo;
+import com.persoff68.fatodo.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -11,15 +11,15 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class UserServiceClientWrapper implements UserServiceClient {
+public class UserSystemServiceClientWrapper implements UserSystemServiceClient {
 
-    @Qualifier("feignUserServiceClient")
-    private final UserServiceClient userServiceClient;
+    @Qualifier("feignUserSystemServiceClient")
+    private final UserSystemServiceClient userSystemServiceClient;
 
     @Override
-    public List<UserInfo> getAllInfoByIds(List<UUID> userIdList) {
+    public List<User> getAllUserDataByIds(List<UUID> userIdList) {
         try {
-            return userServiceClient.getAllInfoByIds(userIdList);
+            return userSystemServiceClient.getAllUserDataByIds(userIdList);
         } catch (Exception e) {
             throw new ClientException();
         }

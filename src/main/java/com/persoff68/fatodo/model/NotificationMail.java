@@ -19,8 +19,8 @@ public class NotificationMail {
 
     private String url;
 
-    public NotificationMail(UserInfo user, ReminderInfo message) {
-        this.language = user.getLanguage();
+    public NotificationMail(User user, ReminderInfo message) {
+        this.language = user.getInfo().getLanguage();
         this.email = user.getEmail();
         this.username = user.getUsername();
         this.message = message.getMessage();

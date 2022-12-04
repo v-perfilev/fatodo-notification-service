@@ -6,10 +6,10 @@ import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderInfo;
 import com.persoff68.fatodo.builder.TestReminderThread;
-import com.persoff68.fatodo.builder.TestUserInfo;
+import com.persoff68.fatodo.builder.TestUser;
 import com.persoff68.fatodo.client.ItemSystemServiceClient;
 import com.persoff68.fatodo.client.MailServiceClient;
-import com.persoff68.fatodo.client.UserServiceClient;
+import com.persoff68.fatodo.client.UserSystemServiceClient;
 import com.persoff68.fatodo.client.WsServiceClient;
 import com.persoff68.fatodo.config.util.KafkaUtils;
 import com.persoff68.fatodo.model.Notification;
@@ -17,7 +17,7 @@ import com.persoff68.fatodo.model.NotificationMail;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderInfo;
 import com.persoff68.fatodo.model.ReminderThread;
-import com.persoff68.fatodo.model.UserInfo;
+import com.persoff68.fatodo.model.User;
 import com.persoff68.fatodo.repository.NotificationRepository;
 import com.persoff68.fatodo.repository.ReminderRepository;
 import com.persoff68.fatodo.repository.ReminderThreadRepository;
@@ -79,7 +79,7 @@ class MailProducerIT {
     @MockBean
     ItemSystemServiceClient itemSystemServiceClient;
     @MockBean
-    UserServiceClient userServiceClient;
+    UserSystemServiceClient userSystemServiceClient;
     @MockBean
     WsServiceClient wsServiceClient;
 
@@ -98,8 +98,8 @@ class MailProducerIT {
 
         ReminderInfo reminderInfo = TestReminderInfo.defaultBuilder().build().toParent();
         when(itemSystemServiceClient.getReminderMailInfo(any())).thenReturn(reminderInfo);
-        UserInfo userInfo = TestUserInfo.defaultBuilder().build().toParent();
-        when(userServiceClient.getAllInfoByIds(any())).thenReturn(Collections.singletonList(userInfo));
+        User user = TestUser.defaultBuilder().build().toParent();
+        when(userSystemServiceClient.getAllUserDataByIds(any())).thenReturn(Collections.singletonList(user));
 
         startNotificationConsumer();
     }
