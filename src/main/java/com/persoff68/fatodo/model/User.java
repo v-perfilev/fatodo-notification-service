@@ -27,6 +27,8 @@ public class User extends AbstractModel {
 
     private Info info;
 
+    private Settings settings;
+
     @Data
     public static class Info {
 
@@ -45,6 +47,13 @@ public class User extends AbstractModel {
         private String timeFormat;
 
         private String dateFormat;
+
+    }
+
+    @Data
+    public static class Settings {
+
+        private boolean emailReminders;
 
     }
 
