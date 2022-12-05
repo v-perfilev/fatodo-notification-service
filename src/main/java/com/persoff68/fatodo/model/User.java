@@ -36,9 +36,14 @@ public class User extends AbstractModel {
 
         private String lastname;
 
+        private String gender;
+
         private String imageFilename;
 
-        private String gender;
+    }
+
+    @Data
+    public static class Settings {
 
         private String language;
 
@@ -47,11 +52,6 @@ public class User extends AbstractModel {
         private String timeFormat;
 
         private String dateFormat;
-
-    }
-
-    @Data
-    public static class Settings {
 
         private boolean emailReminders;
 
