@@ -14,7 +14,8 @@ public class TestUser extends User {
              String username,
              String firstname,
              String lastname,
-             String language) {
+             String language,
+             boolean emailReminders) {
         super();
         setId(id);
         setEmail(email);
@@ -24,6 +25,7 @@ public class TestUser extends User {
         getInfo().setLastname(lastname);
         setSettings(new Settings());
         getSettings().setLanguage(language);
+        getSettings().setEmailReminders(emailReminders);
     }
 
     public static TestUserBuilder defaultBuilder() {
@@ -33,7 +35,8 @@ public class TestUser extends User {
                 .username(DEFAULT_VALUE)
                 .firstname(DEFAULT_VALUE)
                 .lastname(DEFAULT_VALUE)
-                .language("EN");
+                .language("EN")
+                .emailReminders(true);
     }
 
     public User toParent() {
@@ -46,6 +49,7 @@ public class TestUser extends User {
         user.getInfo().setLastname(getInfo().getLastname());
         user.setSettings(new Settings());
         user.getSettings().setLanguage(getSettings().getLanguage());
+        user.getSettings().setEmailReminders(getSettings().isEmailReminders());
         return user;
     }
 
