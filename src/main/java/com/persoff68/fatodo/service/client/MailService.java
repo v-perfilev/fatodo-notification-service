@@ -23,7 +23,10 @@ public class MailService {
     @Transactional
     public void sendNotification(ReminderInfo reminderInfo) {
         List<User> userList = getUserListByIds(reminderInfo.getUserIds());
-        sendMailNotifications(reminderInfo, userList);
+        List<User> filteredUserList = userList.stream()
+                .filter(u -> u.getSettings().isEmailReminders())
+                .toList();
+        sendMailNotifications(reminderInfo, filteredUserList);
     }
 
     private void sendMailNotifications(ReminderInfo reminderInfo, List<User> userList) {
