@@ -181,7 +181,7 @@ public class NotificationService {
     private Predicate<Date> weekDaysFilter(List<Integer> weekDays) {
         return date -> {
             Instant instant = date.toInstant();
-            int dayOfWeek = instant.atZone(ZoneId.systemDefault()).getDayOfWeek().getValue();
+            int dayOfWeek = instant.atZone(ZoneId.systemDefault()).getDayOfWeek().getValue() - 1;
             return weekDays.contains(dayOfWeek);
         };
     }

@@ -118,7 +118,7 @@ class ReminderControllerIT {
     void testGetAllByMonths_ok_weekly() throws Exception {
         Reminder reminder = TestReminder.defaultBuilder().thread(thread)
                 .periodicity(Periodicity.WEEKLY)
-                .weekDays(List.of(7))
+                .weekDays(List.of(0))
                 .build().toParent();
         thread.setReminders(List.of(reminder));
         threadRepository.save(thread);
