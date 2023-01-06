@@ -6,11 +6,13 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.google.common.collect.Multimap;
 import com.persoff68.fatodo.FatodoNotificationServiceApplication;
 import com.persoff68.fatodo.annotation.WithCustomSecurityContext;
+import com.persoff68.fatodo.builder.TestDateParams;
 import com.persoff68.fatodo.builder.TestNotification;
 import com.persoff68.fatodo.builder.TestReminder;
 import com.persoff68.fatodo.builder.TestReminderDTO;
 import com.persoff68.fatodo.builder.TestReminderThread;
 import com.persoff68.fatodo.client.ItemServiceClient;
+import com.persoff68.fatodo.model.DateParams;
 import com.persoff68.fatodo.model.Notification;
 import com.persoff68.fatodo.model.Reminder;
 import com.persoff68.fatodo.model.ReminderThread;
@@ -70,11 +72,12 @@ class ReminderControllerIT {
     @MockBean
     ItemServiceClient itemServiceClient;
 
+    ReminderThread thread;
+
 
     @BeforeEach
     void setup() {
-        ReminderThread thread =
-                TestReminderThread.defaultBuilder().parentId(PARENT_ID).targetId(TARGET_ID).build().toParent();
+        thread = TestReminderThread.defaultBuilder().parentId(PARENT_ID).targetId(TARGET_ID).build().toParent();
         Reminder reminder = TestReminder.defaultBuilder().thread(thread)
                 .periodicity(Periodicity.DAILY)
                 .build().toParent();
@@ -108,6 +111,72 @@ class ReminderControllerIT {
         assertThat(resultMultimap.keySet()).hasSize(2);
         assertThat(resultMultimap.get("2090_0")).hasSize(31);
         assertThat(resultMultimap.get("2090_1")).hasSize(28);
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    void testGetAllByMonths_ok_weekly() throws Exception {
+        Reminder reminder = TestReminder.defaultBuilder().thread(thread)
+                .periodicity(Periodicity.WEEKLY)
+                .weekDays(List.of(7))
+                .build().toParent();
+        thread.setReminders(List.of(reminder));
+        threadRepository.save(thread);
+
+        String url = ENDPOINT + "/calendar?yearFrom=2090&monthFrom=0&yearTo=2090&monthTo=1&timezone=Europe/Berlin";
+        ResultActions resultActions = mvc.perform(get(url))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        JavaType javaType = objectMapper.getTypeFactory().constructMapLikeType(Multimap.class, String.class,
+                CalendarReminderDTO.class);
+        Multimap<String, CalendarReminderDTO> resultMultimap = objectMapper.readValue(resultString, javaType);
+        assertThat(resultMultimap.keySet()).hasSize(2);
+        assertThat(resultMultimap.get("2090_0")).hasSize(5);
+        assertThat(resultMultimap.get("2090_1")).hasSize(4);
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    void testGetAllByMonths_ok_monthly() throws Exception {
+        Reminder reminder = TestReminder.defaultBuilder().thread(thread)
+                .periodicity(Periodicity.MONTHLY)
+                .monthDays(List.of(1))
+                .build().toParent();
+        thread.setReminders(List.of(reminder));
+        threadRepository.save(thread);
+
+        String url = ENDPOINT + "/calendar?yearFrom=2090&monthFrom=0&yearTo=2090&monthTo=1&timezone=Europe/Berlin";
+        ResultActions resultActions = mvc.perform(get(url))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        JavaType javaType = objectMapper.getTypeFactory().constructMapLikeType(Multimap.class, String.class,
+                CalendarReminderDTO.class);
+        Multimap<String, CalendarReminderDTO> resultMultimap = objectMapper.readValue(resultString, javaType);
+        assertThat(resultMultimap.keySet()).hasSize(2);
+        assertThat(resultMultimap.get("2090_0")).hasSize(1);
+        assertThat(resultMultimap.get("2090_1")).hasSize(1);
+    }
+
+    @Test
+    @WithCustomSecurityContext
+    void testGetAllByMonths_ok_yearly() throws Exception {
+        DateParams dateParams = TestDateParams.defaultBuilder().date(10).month(1).build().toParent();
+        Reminder reminder = TestReminder.defaultBuilder().thread(thread)
+                .periodicity(Periodicity.YEARLY)
+                .date(dateParams)
+                .build().toParent();
+        thread.setReminders(List.of(reminder));
+        threadRepository.save(thread);
+
+        String url = ENDPOINT + "/calendar?yearFrom=2090&monthFrom=0&yearTo=2090&monthTo=1&timezone=Europe/Berlin";
+        ResultActions resultActions = mvc.perform(get(url))
+                .andExpect(status().isOk());
+        String resultString = resultActions.andReturn().getResponse().getContentAsString();
+        JavaType javaType = objectMapper.getTypeFactory().constructMapLikeType(Multimap.class, String.class,
+                CalendarReminderDTO.class);
+        Multimap<String, CalendarReminderDTO> resultMultimap = objectMapper.readValue(resultString, javaType);
+        assertThat(resultMultimap.keySet()).hasSize(1);
+        assertThat(resultMultimap.get("2090_1")).hasSize(1);
     }
 
     @Test

@@ -65,7 +65,7 @@ public class DateUtils {
                 : null;
     }
 
-    public static Date createYearlyDate(DateParams dateParams) {
+    public static Date createYearlyDate(DateParams dateParams, int year) {
         String timezone = dateParams.getTimezone();
 
         int date = dateParams.getDate();
@@ -74,12 +74,8 @@ public class DateUtils {
         int hours = getHours(time);
         int minutes = getMinutes(time);
 
-        Calendar today = createCalendar(timezone);
-        int year = today.get(Calendar.YEAR);
-
         Calendar calendar = createCalendar(timezone);
         calendar.set(year, month, date, hours, minutes, 0);
-        addConditionalYearOffset(today, year, calendar);
         return convertCalendarToDate(calendar);
     }
 
@@ -99,12 +95,6 @@ public class DateUtils {
 
     private static int getMinutes(int time) {
         return time % MINUTES_IN_HOUR;
-    }
-
-    private static void addConditionalYearOffset(Calendar today, int year, Calendar calendar) {
-        if (today.compareTo(calendar) > 0) {
-            calendar.set(Calendar.YEAR, year + 1);
-        }
     }
 
     private static Date convertCalendarToDate(Calendar calendar) {

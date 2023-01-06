@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -91,7 +92,7 @@ public class NotificationService {
             case DAILY -> createDailyNotifications(reminder, startOptional, periodInDays);
             case WEEKLY -> createWeeklyNotifications(reminder, startOptional, periodInDays);
             case MONTHLY -> createMonthlyNotifications(reminder, startOptional, periodInDays);
-            case YEARLY -> createYearlyNotifications(reminder);
+            case YEARLY -> createYearlyNotifications(reminder, startOptional, periodInDays);
         };
     }
 
@@ -146,11 +147,25 @@ public class NotificationService {
                 .toList();
     }
 
-    private List<Notification> createYearlyNotifications(Reminder reminder) {
+    private List<Notification> createYearlyNotifications(Reminder reminder,
+                                                         Optional<Calendar> startOptional,
+                                                         int calculationPeriod) {
         DateParams params = reminder.getDate();
-        Date date = DateUtils.createYearlyDate(params);
-        Notification notification = new Notification(reminder, date);
-        return Collections.singletonList(notification);
+        Date startDate = DateUtils.createRelativeDate(params, startOptional, 0);
+        Date endDate = DateUtils.createRelativeDate(params, startOptional, calculationPeriod);
+
+        return List.of(startDate, endDate).stream()
+                .map(date -> {
+                    Calendar calendar = new GregorianCalendar();
+                    calendar.setTime(date);
+                    return calendar.get(Calendar.YEAR);
+                })
+                .distinct()
+                .map(year -> DateUtils.createYearlyDate(params, year))
+                .filter(date -> date.after(startDate))
+                .filter(date -> date.before(endDate))
+                .map(date -> new Notification(reminder, date))
+                .toList();
     }
 
     private void setNotificationsToPending(List<Notification> notificationList) {
