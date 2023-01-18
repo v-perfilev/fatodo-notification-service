@@ -24,7 +24,7 @@ public class MailService {
     public void sendNotification(ReminderInfo reminderInfo) {
         List<User> userList = getUserListByIds(reminderInfo.getUserIds());
         List<User> filteredUserList = userList.stream()
-                .filter(u -> u.getSettings().isEmailReminders())
+                .filter(u -> u.getNotifications().getEmailNotifications().contains(User.EmailNotificationType.REMINDER))
                 .toList();
         sendMailNotifications(reminderInfo, filteredUserList);
     }

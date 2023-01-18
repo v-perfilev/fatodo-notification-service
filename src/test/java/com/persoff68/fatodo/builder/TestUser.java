@@ -3,6 +3,7 @@ package com.persoff68.fatodo.builder;
 import com.persoff68.fatodo.model.User;
 import lombok.Builder;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 public class TestUser extends User {
@@ -25,7 +26,12 @@ public class TestUser extends User {
         getInfo().setLastname(lastname);
         setSettings(new Settings());
         getSettings().setLanguage(language);
-        getSettings().setEmailReminders(emailReminders);
+        setNotifications(new Notifications());
+        getNotifications().setPushNotifications(new HashSet<>());
+        getNotifications().setEmailNotifications(new HashSet<>());
+        if (emailReminders) {
+            getNotifications().getEmailNotifications().add(EmailNotificationType.REMINDER);
+        }
     }
 
     public static TestUserBuilder defaultBuilder() {
@@ -49,7 +55,7 @@ public class TestUser extends User {
         user.getInfo().setLastname(getInfo().getLastname());
         user.setSettings(new Settings());
         user.getSettings().setLanguage(getSettings().getLanguage());
-        user.getSettings().setEmailReminders(getSettings().isEmailReminders());
+        user.setNotifications(getNotifications());
         return user;
     }
 
