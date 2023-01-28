@@ -62,7 +62,7 @@ public class DateUtils {
 
         return startOptional.isPresent() || resultInstant.isAfter(Instant.now())
                 ? Date.from(resultInstant)
-                : null;
+                : Date.from(Instant.now());
     }
 
     public static Date createYearlyDate(DateParams dateParams, int year) {
