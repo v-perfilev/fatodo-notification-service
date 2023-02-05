@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -151,10 +152,13 @@ public class NotificationService {
                                                          Optional<Calendar> startOptional,
                                                          int calculationPeriod) {
         DateParams params = reminder.getDate();
-        Date startDate = DateUtils.createRelativeDate(params, startOptional, 0);
+        Date relativeStartDate = DateUtils.createRelativeDate(params, startOptional, 0);
+        Date startDate = Optional.ofNullable(relativeStartDate)
+                .orElse(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
         Date endDate = DateUtils.createRelativeDate(params, startOptional, calculationPeriod);
 
-        return List.of(startDate, endDate).stream()
+        return Stream.of(startDate, endDate)
+                .filter(Objects::nonNull)
                 .map(date -> {
                     Calendar calendar = new GregorianCalendar();
                     calendar.setTime(date);
