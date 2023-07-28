@@ -38,7 +38,8 @@ public class DatabaseConfiguration {
     private void removeExpiredLocks() {
         long timeoutInMillis = appProperties.getDb().getLiquibaseLockTimeoutSec() * 1000;
         Timestamp lastLockTime = new Timestamp(System.currentTimeMillis() - timeoutInMillis);
-        String query = String.format("DELETE FROM DATABASECHANGELOGLOCK WHERE LOCKED=true AND LOCKGRANTED<'%s'", lastLockTime);
+        String queryTemplate = "DELETE FROM DATABASECHANGELOGLOCK WHERE LOCKED=true AND LOCKGRANTED<'%s'";
+        String query = String.format(queryTemplate, lastLockTime);
 
         try (Statement statement = dataSource.getConnection().createStatement()) {
             int updateCount = statement.executeUpdate(query);
