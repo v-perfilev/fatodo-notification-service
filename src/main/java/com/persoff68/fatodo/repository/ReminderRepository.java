@@ -2,6 +2,7 @@ package com.persoff68.fatodo.repository;
 
 import com.persoff68.fatodo.model.Reminder;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +25,7 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
             select r from Reminder r
             where r.thread.parentId in :parentIds and r.createdAt < :endMonthDate
             """)
+    @EntityGraph(attributePaths = {"thread"})
     List<Reminder> findAllByParentIds(@Param("parentIds") List<UUID> parentIds,
                                       @Param("endMonthDate") Date endMonthDate);
 
